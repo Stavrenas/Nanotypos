@@ -10,7 +10,7 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="0!"
+        android:text="0"
         android:textSize="34sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
@@ -34,7 +34,7 @@
         app:srcCompat="@drawable/nanotypus" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/pressButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Press"
@@ -46,7 +46,7 @@
         app:layout_constraintVertical_bias="0.142" />
 
     <Button
-        android:id="@+id/logo"
+        android:id="@+id/logoButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Logo"
@@ -54,7 +54,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/logo_image"
-        app:layout_constraintVertical_bias="0.304" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.881" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

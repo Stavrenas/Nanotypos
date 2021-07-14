@@ -1,24 +1,29 @@
 package com.example.nanotypos
 
 import android.os.Bundle
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.nanotypos.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        val rollButton: Button = findViewById(R.id.button)
-        rollButton.setOnClickListener {
-            rollDice()
-            Toast.makeText(this, "Dice Rolled!", Toast.LENGTH_SHORT).show()}
 
-        val logoButton: Button = findViewById(R.id.logo)
+    lateinit var binding: ActivityMainBinding
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+
+        super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        binding.pressButton.setOnClickListener{
+            rollDice()
+            Toast.makeText(this, "Dice Rolled!", Toast.LENGTH_SHORT).show()
+        }
+
         var logo = true
-        logoButton.setOnClickListener{
+        binding.logoButton.setOnClickListener{
             val logoImage: ImageView = findViewById(R.id.logo_image)
 
             logo = if (logo) {
