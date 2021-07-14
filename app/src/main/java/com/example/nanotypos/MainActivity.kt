@@ -30,7 +30,7 @@ class MainActivity : AppCompatActivity() {
                 logoImage.setImageResource(R.drawable.nanotypos_logo1)
                 false
             } else {
-                logoImage.setImageResource(R.drawable.nanotypus)
+                logoImage.setImageResource(R.drawable.nanotypos)
                 true
             }
 
