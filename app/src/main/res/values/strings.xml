@@ -6,4 +6,7 @@
     <string name="Camera">Camera</string>
     <string name="Image">Image</string>
     <string name="Usage">Tap on Image to import an image from gallery or tap Camera to capture an image</string>
+    <string name="Search">Search for</string>
+    <string name="QR">QR Code</string>
+    <string name="ForLogo">Nanotypos Logo</string>
 </resources>
