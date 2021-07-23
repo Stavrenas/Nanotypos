@@ -47,7 +47,7 @@ class StartFragment : Fragment() {
 
     fun pickImage() {
 
-        Toast.makeText(activity, "Pick Image pressed!",Toast.LENGTH_LONG).show();
+        Toast.makeText(activity, "Pick Image pressed!",Toast.LENGTH_LONG).show()
         val context = context
         if (context?.let {
                 ActivityCompat.checkSelfPermission(
@@ -116,7 +116,7 @@ class StartFragment : Fragment() {
 
 
     fun openCamera(){
-        Toast.makeText(activity, "Open Camera pressed!",Toast.LENGTH_LONG).show();
+        Toast.makeText(activity, "Open Camera pressed!",Toast.LENGTH_LONG).show()
         findNavController().navigate(R.id.action_startFragment_to_cameraFragment)
 
 

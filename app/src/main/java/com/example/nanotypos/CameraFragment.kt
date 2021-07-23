@@ -1,4 +1,6 @@
 package com.example.nanotypos
 
-class CameraFragment {
+import androidx.fragment.app.Fragment
+
+class CameraFragment: Fragment() {
 }
