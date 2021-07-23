@@ -1,55 +1,35 @@
 package com.example.nanotypos
 
 import android.os.Bundle
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.nanotypos.databinding.ActivityMainBinding
+import androidx.navigation.NavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupActionBarWithNavController
 
-class MainActivity : AppCompatActivity() {
 
-    lateinit var binding: ActivityMainBinding
+class MainActivity : AppCompatActivity(R.layout.activity_main)  {
+
+    private lateinit var navController: NavController
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
 
-        binding.pressButton.setOnClickListener{
-            rollDice()
-            Toast.makeText(this, "Dice Rolled!", Toast.LENGTH_SHORT).show()
-        }
+        val navHostFragment = supportFragmentManager
+            .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        navController = navHostFragment.navController
 
-        var logo = true
-        binding.logoButton.setOnClickListener{
-            val logoImage: ImageView = findViewById(R.id.logo_image)
+        setupActionBarWithNavController(navController)
 
-            logo = if (logo) {
-                logoImage.setImageResource(R.drawable.nanotypos_logo1)
-                false
-            } else {
-                logoImage.setImageResource(R.drawable.nanotypos)
-                true
-            }
+    }
 
-        }
+    override fun onSupportNavigateUp(): Boolean {
+        return navController.navigateUp() || super.onSupportNavigateUp()
     }
 
 
-    private fun rollDice() {
-        val dice = Dice(6)
-        val diceRoll = dice.roll()
-        val resultTextView: TextView = findViewById(R.id.textView)
-        resultTextView.text = diceRoll.toString()
 
-    }
+
 }
 
-class Dice(val numSides: Int) {
-
-    fun roll(): Int {
-        return (1..numSides).random()
-    }
-}
