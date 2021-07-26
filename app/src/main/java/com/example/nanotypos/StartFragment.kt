@@ -3,7 +3,6 @@ package com.example.nanotypos
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
@@ -47,8 +46,7 @@ class StartFragment : Fragment() {
     val REQUEST_IMAGE_OPEN = 1
     fun pickImage() {
 
-        Toast.makeText(activity, "Pick Image pressed!",Toast.LENGTH_LONG).show()
-        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+        val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
             type = "image/*"
             addCategory(Intent.CATEGORY_OPENABLE)
         }
@@ -73,17 +71,17 @@ class StartFragment : Fragment() {
         return Uri.parse("android.resource://$packageName/$drawable")
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        when (requestCode) {
-            READ_EXTERNAL_STORAGE_REQUEST_CODE -> {
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    // pick image after request permission success
-                    pickImage()
-                }
-            }
-        }
-    }
+//    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+//        when (requestCode) {
+//            READ_EXTERNAL_STORAGE_REQUEST_CODE -> {
+//                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                    // pick image after request permission success
+//                    pickImage()
+//                }
+//            }
+//        }
+//    }
 
 
     companion object {
