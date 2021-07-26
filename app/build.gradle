@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.nanotypos"
-        minSdkVersion 23
+        minSdkVersion 24
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
@@ -63,4 +63,6 @@ dependencies {
     implementation("androidx.camera:camera-view:1.0.0-alpha27")
     // If you want to additionally use the CameraX Extensions library
     implementation("androidx.camera:camera-extensions:1.0.0-alpha27")
+
+    implementation 'com.google.mlkit:barcode-scanning:16.2.0'
 }

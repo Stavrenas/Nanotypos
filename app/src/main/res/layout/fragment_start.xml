@@ -27,7 +27,7 @@
             android:layout_marginBottom="150dp"
             android:drawableLeft="@drawable/ic_baseline_camera_alt_24"
             android:importantForAccessibility="no"
-            android:onClick="@{() ->startFragment.openCamera()}"
+            android:onClick="@{() ->startFragment.captureImage()}"
             android:text="@string/Camera"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

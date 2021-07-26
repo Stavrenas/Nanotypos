@@ -43,6 +43,7 @@ class ImageFragment: Fragment() {
 
     fun searchForLogo(){
         Toast.makeText(activity, "Search for Logo pressed!", Toast.LENGTH_LONG).show()
+        //sharedViewModel.uri
 
     }
 
