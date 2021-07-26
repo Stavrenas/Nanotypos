@@ -1,9 +1,7 @@
 package com.example.nanotypos
 
-import android.Manifest
 import android.app.Activity
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.icu.text.SimpleDateFormat
 import android.net.Uri
 import android.os.Bundle
@@ -13,8 +11,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -57,16 +53,15 @@ class StartFragment : Fragment() {
     }
 
 
-    /* PICK IMAGE */
-    fun pickImage() {
 
+    //function to launch intent to open gallery
+    fun pickImage() {
         val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
             type = "image/*"
             addCategory(Intent.CATEGORY_OPENABLE)
         }
         // Only the system receives the ACTION_OPEN_DOCUMENT, so no need to test.
         startActivityForResult(intent, REQUEST_IMAGE_OPEN)
-
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -74,7 +69,7 @@ class StartFragment : Fragment() {
         if (requestCode == REQUEST_IMAGE_OPEN && resultCode == Activity.RESULT_OK) {
             val fullPhotoUri: Uri? = data?.data
             if (fullPhotoUri != null) {
-                sharedViewModel.setUri(fullPhotoUri)
+                sharedViewModel.setModelUri(fullPhotoUri)
             }
             findNavController().navigate(R.id.action_startFragment_to_imageFragment)
         }
@@ -86,49 +81,9 @@ class StartFragment : Fragment() {
 
     }
 
-//    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-//        when (requestCode) {
-//            READ_EXTERNAL_STORAGE_REQUEST_CODE -> {
-//                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//                    // pick image after request permission success
-//                    pickImage()
-//                }
-//            }
-//        }
-//    }
 
 
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        binding = null
-    }
-
-
-    fun openCamera(){
-        Toast.makeText(activity, "Open Camera pressed!",Toast.LENGTH_SHORT).show()
-        if (activity?.let {
-                ContextCompat.checkSelfPermission(
-                    it,
-                    Manifest.permission.CAMERA
-                )
-            } != PackageManager.PERMISSION_GRANTED
-        ) {
-            activity?.let {
-                ActivityCompat.requestPermissions(
-                    it,
-                    arrayOf(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                    0
-                )
-            }
-        } else {
-        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        startActivityForResult(intent, REQUEST_IMAGE_CAPTURE)}
-
-
-    }
-
+    //function to launch intent to open camera and capture an image
     fun captureImage() {
         Toast.makeText(activity, "Open Camera pressed!",Toast.LENGTH_SHORT).show()
         val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
@@ -142,7 +97,7 @@ class StartFragment : Fragment() {
                             "com.example.nanotypos.fileprovider",
                             photoFile!!
                         )
-                        sharedViewModel.setUri(photoURI)
+                        sharedViewModel.setModelUri(photoURI)
                         takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
 
                         startActivityForResult(takePictureIntent, CAPTURE_IMAGE_REQUEST)
@@ -167,6 +122,26 @@ class StartFragment : Fragment() {
             currentPhotoPath = absolutePath
         }
     }
+
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        binding = null
+    }
+
+    //    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+//        when (requestCode) {
+//            READ_EXTERNAL_STORAGE_REQUEST_CODE -> {
+//                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                    // pick image after request permission success
+//                    pickImage()
+//                }
+//            }
+//        }
+//    }
+
+
 
 }
 

@@ -12,8 +12,12 @@ class ViewModel : ViewModel() {
     private val _uri = MutableLiveData<Uri>()
     val uri: LiveData<Uri> = _uri
 
-    fun setUri(targetUri: Uri){
+    fun setModelUri(targetUri: Uri){
         _uri.value = targetUri
+    }
+
+    fun getModelUri() : Uri? {
+        return  _uri.value
     }
 
     init {

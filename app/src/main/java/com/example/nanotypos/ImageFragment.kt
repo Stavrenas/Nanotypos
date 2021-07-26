@@ -1,5 +1,6 @@
 package com.example.nanotypos
 
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +10,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.example.nanotypos.data.ViewModel
 import com.example.nanotypos.databinding.FragmentImageBinding
+import com.google.mlkit.vision.barcode.Barcode
+import com.google.mlkit.vision.barcode.BarcodeScanning
+import com.google.mlkit.vision.common.InputImage
+import java.io.IOException
 
 class ImageFragment: Fragment() {
 
@@ -43,12 +48,60 @@ class ImageFragment: Fragment() {
 
     fun searchForLogo(){
         Toast.makeText(activity, "Search for Logo pressed!", Toast.LENGTH_LONG).show()
-        //sharedViewModel.uri
+
 
     }
 
     fun searchForQR(){
         Toast.makeText(activity, "Search for QR pressed!", Toast.LENGTH_LONG).show()
+        val uri: Uri? = sharedViewModel.getModelUri()
+        val image: InputImage
+        try {
+            image = InputImage.fromFilePath(context, uri)
+            //get instance of barcode scanner
+            val scanner = BarcodeScanning.getClient()
+            //Process the image
+            val result = scanner.process(image)
+                .addOnSuccessListener { barcodes ->
+                    for (barcode in barcodes) {
+                        //Get information from barcodes
+
+                        val bounds = barcode.boundingBox
+                        val corners = barcode.cornerPoints
+
+                        val rawValue = barcode.rawValue
+
+                        // See API reference for complete list of supported types
+                        when (barcode.valueType) {
+                            Barcode.TYPE_WIFI -> {
+                                val ssid = barcode.wifi!!.ssid
+                                val password = barcode.wifi!!.password
+                                val type = barcode.wifi!!.encryptionType
+                            }
+                            Barcode.TYPE_URL -> {
+                                val title = barcode.url!!.title
+                                val url = barcode.url!!.url
+                            }
+                        }
+                    }
+                    // Task completed successfully
+                    // ...
+                }
+                .addOnFailureListener {
+                    // Task failed with an exception
+                    // ...
+                }
+
+
+
+
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+
+
+
+
     }
 
 }
