@@ -129,6 +129,10 @@ class StartFragment : Fragment() {
         binding = null
     }
 
+    fun launchPreview(){
+        findNavController().navigate(R.id.action_startFragment_to_cameraFragment)
+    }
+
     //    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
 //        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
 //        when (requestCode) {

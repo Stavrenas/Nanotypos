@@ -23,9 +23,6 @@
         android:label="@string/Camera"
         tools:layout="@layout/fragment_camera" >
         <action
-            android:id="@+id/action_cameraFragment_to_ImageFragment"
-            app:destination="@id/imageFragment" />
-        <action
             android:id="@+id/action_cameraFragment_to_startFragment"
             app:destination="@id/startFragment"
             app:popUpTo="@id/startFragment"
@@ -34,7 +31,7 @@
     <fragment
         android:id="@+id/imageFragment"
         android:name="com.example.nanotypos.ImageFragment"
-        android:label="@string/Image"
+        android:label="Image Information"
         tools:layout="@layout/fragment_image" >
         <action
             android:id="@+id/action_imageFragment_to_startFragment"
@@ -42,9 +39,5 @@
             app:popUpTo="@id/startFragment"
             app:popUpToInclusive="true" />
     </fragment>
-
-
-
-
 
 </navigation>
