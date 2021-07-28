@@ -47,13 +47,13 @@ class ImageFragment: Fragment() {
     }
 
     fun searchForLogo(){
-        Toast.makeText(activity, "Search for Logo pressed!", Toast.LENGTH_LONG).show()
+        Toast.makeText(activity, "Search for Logo pressed!", Toast.LENGTH_SHORT).show()
 
 
     }
 
     fun searchForQR(){
-        Toast.makeText(activity, "Search for QR pressed!", Toast.LENGTH_LONG).show()
+        Toast.makeText(activity, "Search for QR pressed!", Toast.LENGTH_SHORT).show()
         val uri: Uri? = sharedViewModel.getModelUri()
         val image: InputImage
         try {

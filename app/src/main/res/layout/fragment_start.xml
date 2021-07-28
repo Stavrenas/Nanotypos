@@ -106,7 +106,7 @@
                 android:layout_marginEnd="174dp"
                 android:text="@string/Usage"
                 android:textAlignment="center"
-                android:textSize="23sp"
+                android:textSize="22sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toTopOf="@+id/imageButton"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -122,13 +122,13 @@
                 android:layout_marginStart="10dp"
                 android:layout_marginTop="50dp"
                 android:text="@string/ForPreview"
-                android:textSize="24sp"
+                android:textSize="22sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/previewButton"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/cameraButton"
-                app:layout_constraintVertical_bias="0.19" />
+                app:layout_constraintVertical_bias="0.093" />
 
             <Button
                 android:id="@+id/previewButton"
@@ -136,6 +136,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="50dp"
                 android:layout_marginEnd="10dp"
+                android:drawableLeft="@drawable/preview"
+                android:onClick="@{() ->startFragment.launchPreview()}"
                 android:text="Preview"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

@@ -12,6 +12,10 @@ class ViewModel : ViewModel() {
     private val _uri = MutableLiveData<Uri>()
     val uri: LiveData<Uri> = _uri
 
+
+    private val _logoButtonSelected = MutableLiveData<Boolean>()
+    val logoButtonSelected: LiveData<Boolean> = _logoButtonSelected
+
     fun setModelUri(targetUri: Uri){
         _uri.value = targetUri
     }
@@ -20,7 +24,13 @@ class ViewModel : ViewModel() {
         return  _uri.value
     }
 
+    fun toggleLogoButton() {
+        _logoButtonSelected.value = !_logoButtonSelected.value!!
+    }
+
+
     init {
+        _logoButtonSelected.value = true
 
     }
 

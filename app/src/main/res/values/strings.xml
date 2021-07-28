@@ -10,4 +10,5 @@
     <string name="QR">QR Code</string>
     <string name="ForLogo">Nanotypos Logo</string>
     <string name="ForPreview">Tap for live preview</string>
+    <string name="Preview">Live Camera Preview</string>
 </resources>

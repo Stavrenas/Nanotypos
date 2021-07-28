@@ -1,23 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/cameraFragment"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    tools:context=".CameraFragment">
 
-    <androidx.camera.view.PreviewView
-        android:id="@+id/activity_main_previewView"
+    <data>
+        <variable
+            name="cameraFragment"
+            type="com.example.nanotypos.CameraFragment" />
+        <variable
+            name="viewModel"
+            type="com.example.nanotypos.data.ViewModel" />
+    </data>
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="55dp"
-        android:layout_marginBottom="150dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0">
+        android:layout_height="match_parent">
 
-    </androidx.camera.view.PreviewView>
+        <androidx.camera.view.PreviewView
+            android:id="@+id/viewFinder"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="200dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.camera.view.PreviewView>
+
+        <RadioGroup
+            android:id="@+id/preview_options"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="10dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.961">
+
+
+            <RadioButton
+                android:id="@+id/logoButton"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="52dp"
+                android:checked="@{viewModel.logoButtonSelected.equals(true)}"
+                android:onClick="@{() -> cameraFragment.searchLogoPreview()}"
+                android:text="@string/ForLogo"
+                app:layout_constraintBottom_toTopOf="@+id/qrButton"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/viewFinder" />
+
+            <RadioButton
+                android:id="@+id/qrButton"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="10dp"
+                android:checked="@{viewModel.logoButtonSelected.equals(false)}"
+                android:onClick="@{() ->cameraFragment.searchQRPreview()}"
+                android:text="@string/QR"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/logoButton"
+                app:layout_constraintVertical_bias="0.0" />
+
+        </RadioGroup>
+
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:text="@string/Search"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@+id/preview_options"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/viewFinder"
+            app:layout_constraintVertical_bias="0.0" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</layout>
