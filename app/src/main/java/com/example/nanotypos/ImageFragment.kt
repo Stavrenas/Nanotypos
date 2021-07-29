@@ -37,8 +37,6 @@ class ImageFragment: Fragment() {
             viewModel = sharedViewModel
             imageFragment = this@ImageFragment
         }
-
-
     }
 
     override fun onDestroyView() {
@@ -48,8 +46,6 @@ class ImageFragment: Fragment() {
 
     fun searchForLogo(){
         Toast.makeText(activity, "Search for Logo pressed!", Toast.LENGTH_SHORT).show()
-
-
     }
 
     fun searchForQR(){
@@ -68,7 +64,6 @@ class ImageFragment: Fragment() {
 
                         val bounds = barcode.boundingBox
                         val corners = barcode.cornerPoints
-
                         val rawValue = barcode.rawValue
 
                         // See API reference for complete list of supported types
@@ -93,16 +88,8 @@ class ImageFragment: Fragment() {
                     // ...
                 }
 
-
-
-
         } catch (e: IOException) {
             e.printStackTrace()
         }
-
-
-
-
     }
-
 }

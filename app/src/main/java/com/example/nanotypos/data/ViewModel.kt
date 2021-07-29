@@ -28,6 +28,10 @@ class ViewModel : ViewModel() {
         _logoButtonSelected.value = !_logoButtonSelected.value!!
     }
 
+    fun getLogoButton(): Boolean? {
+       return _logoButtonSelected.value
+    }
+
 
     init {
         _logoButtonSelected.value = true

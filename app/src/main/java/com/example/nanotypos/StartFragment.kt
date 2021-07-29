@@ -76,9 +76,6 @@ class StartFragment : Fragment() {
         else if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
             findNavController().navigate(R.id.action_startFragment_to_imageFragment)
         }
-        else
-            Toast.makeText(activity, "Oopsie!",Toast.LENGTH_LONG).show()
-
     }
 
 
