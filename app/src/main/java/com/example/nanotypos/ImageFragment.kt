@@ -53,7 +53,7 @@ class ImageFragment: Fragment() {
     }
 
     fun searchForQR(){
-        Toast.makeText(activity, "Search for QR pressed!", Toast.LENGTH_SHORT).show()
+        Toast.makeText(activity, "Searching for QR!", Toast.LENGTH_SHORT).show()
         val uri: Uri? = sharedViewModel.getModelUri()
         val image: InputImage
         try {
@@ -81,6 +81,7 @@ class ImageFragment: Fragment() {
                             Barcode.TYPE_URL -> {
                                 val title = barcode.url!!.title
                                 val url = barcode.url!!.url
+                                Toast.makeText(activity, "Url is $url", Toast.LENGTH_SHORT).show()
                             }
                         }
                     }
