@@ -397,10 +397,11 @@ override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
             leftMargin = location.left.toInt()
             width = min(binding.viewFinder.width, location.right.toInt() - location.left.toInt())
             height = min(binding.viewFinder.height, location.bottom.toInt() - location.top.toInt())
-            Log.d("QR", "topMargin is $topMargin")
-            Log.d("QR", "leftMargin is $leftMargin")
+            //Log.d("QR", "topMargin is $topMargin")
+            //Log.d("QR", "leftMargin is $leftMargin")
             //Log.d("QR", "width is $width")
             //Log.d("QR", "height is $height")
+            Log.d("QR", " boundingBox: (${rect.left}, ${rect.top}) - (${rect.right},${rect.bottom})")
         }
 
         binding.boxPrediction.visibility = View.VISIBLE
