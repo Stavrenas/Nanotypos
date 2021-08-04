@@ -18,15 +18,18 @@ import java.io.IOException
 class ImageFragment: Fragment() {
 
     private val sharedViewModel: ViewModel by activityViewModels()
-    private var binding: FragmentImageBinding? = null
+
+    private var _binding: FragmentImageBinding? = null
+
+    private val binding get() = _binding!!
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val fragmentBinding = FragmentImageBinding.inflate(inflater, container, false)
-        binding = fragmentBinding
-        return fragmentBinding.root
+        val _binding = FragmentImageBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -41,7 +44,7 @@ class ImageFragment: Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        binding = null
+        _binding = null
     }
 
     fun searchForLogo(){
