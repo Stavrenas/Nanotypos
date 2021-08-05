@@ -49,55 +49,50 @@ class ImageFragment: Fragment() {
     }
 
     fun searchForLogo(){
+        Toast.makeText(activity, "Search for Logo pressed!", Toast.LENGTH_SHORT).show()
         val localModel = LocalModel.Builder()
-            .setAssetFilePath("ml/model.tflite")
+            .setAssetFilePath("model.tflite")
             .build()
         val uri: Uri? = sharedViewModel.getModelUri()
         val image: InputImage
-        // Live detection and tracking
+        // Detection and tracking
         val customObjectDetectorOptions =
             CustomObjectDetectorOptions.Builder(localModel)
-                .setDetectorMode(CustomObjectDetectorOptions.STREAM_MODE)
+                .setDetectorMode(CustomObjectDetectorOptions.SINGLE_IMAGE_MODE)
                 .enableClassification()
                 .setClassificationConfidenceThreshold(0.5f)
-                .setMaxPerObjectLabelCount(3)
+                .setMaxPerObjectLabelCount(1)
                 .build()
 
         val objectDetector =ObjectDetection.getClient(customObjectDetectorOptions)
         try {
             image = InputImage.fromFilePath(context, uri)
-            objectDetector.process(image).
-            addOnFailureListener { e ->
-
+            objectDetector.process(image)
+                .addOnFailureListener { e ->
                     Log.d("LOGO", "error is $e")
-
-            }
-            .addOnSuccessListener{results ->
-                for (detectedObject in results) {
-                    val boundingBox = detectedObject.boundingBox
-                    val trackingId = detectedObject.trackingId
-                    for (label in detectedObject.labels) {
-                        val text = label.text
-                        val index = label.index
-                        val confidence = label.confidence
-                        Log.d("LOGO", "text is $text")
-                        Log.d("LOGO", "index is $index")
-                        Log.d("LOGO", "confidence is $confidence")
-                        Toast.makeText(activity, "confidence is $confidence", Toast.LENGTH_SHORT).show()
                     }
-                    Log.d("LOGO", "trackingId is $trackingId")
-                    Log.d("QR", " boundingBox: (${boundingBox.left}, ${boundingBox.top}) - (${boundingBox.right},${boundingBox.bottom})")
 
-
-
-
-                }
+                .addOnSuccessListener{results ->
+                    for (detectedObject in results) {
+                        val boundingBox = detectedObject.boundingBox
+                        val trackingId = detectedObject.trackingId
+                        for (label in detectedObject.labels) {
+                            val text = label.text
+                            val index = label.index
+                            val confidence = label.confidence
+                            Log.d("LOGO", "text is $text")
+                            Log.d("LOGO", "index is $index")
+                            Log.d("LOGO", "confidence is $confidence")
+                            Toast.makeText(activity, "confidence is $confidence", Toast.LENGTH_SHORT).show()
+                        }
+                        Log.d("LOGO", "trackingId is $trackingId")
+                        Log.d("LOGO", " boundingBox: (${boundingBox.left}, ${boundingBox.top}) - (${boundingBox.right},${boundingBox.bottom})")
+                    }
             }
 
         } catch (e: IOException) {
             e.printStackTrace()
         }
-        Toast.makeText(activity, "Search for Logo pressed!", Toast.LENGTH_SHORT).show()
     }
 
     fun searchForQR(){
@@ -138,6 +133,7 @@ class ImageFragment: Fragment() {
                 .addOnFailureListener {
                     // Task failed with an exception
                     // ...
+                    Toast.makeText(activity, "No QR code found", Toast.LENGTH_SHORT).show()
                 }
 
         } catch (e: IOException) {
