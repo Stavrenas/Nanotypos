@@ -22,22 +22,15 @@ import java.io.IOException
 class ImageFragment: Fragment() {
 
     private val sharedViewModel: ViewModel by activityViewModels()
-
-    private var _binding: FragmentImageBinding? = null
-
-    private val binding get() = _binding!!
-
-    val localModel = LocalModel.Builder()
-        .setAssetFilePath("ml/model.tflite")
-        .build()
-
+    private var binding: FragmentImageBinding? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val _binding = FragmentImageBinding.inflate(inflater, container, false)
-        return binding.root
+        val fragmentBinding = FragmentImageBinding.inflate(inflater, container, false)
+        binding = fragmentBinding
+        return fragmentBinding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -52,10 +45,13 @@ class ImageFragment: Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null
+        binding = null
     }
 
     fun searchForLogo(){
+        val localModel = LocalModel.Builder()
+            .setAssetFilePath("ml/model.tflite")
+            .build()
         val uri: Uri? = sharedViewModel.getModelUri()
         val image: InputImage
         // Live detection and tracking
@@ -78,6 +74,22 @@ class ImageFragment: Fragment() {
             }
             .addOnSuccessListener{results ->
                 for (detectedObject in results) {
+                    val boundingBox = detectedObject.boundingBox
+                    val trackingId = detectedObject.trackingId
+                    for (label in detectedObject.labels) {
+                        val text = label.text
+                        val index = label.index
+                        val confidence = label.confidence
+                        Log.d("LOGO", "text is $text")
+                        Log.d("LOGO", "index is $index")
+                        Log.d("LOGO", "confidence is $confidence")
+                        Toast.makeText(activity, "confidence is $confidence", Toast.LENGTH_SHORT).show()
+                    }
+                    Log.d("LOGO", "trackingId is $trackingId")
+                    Log.d("QR", " boundingBox: (${boundingBox.left}, ${boundingBox.top}) - (${boundingBox.right},${boundingBox.bottom})")
+
+
+
 
                 }
             }
