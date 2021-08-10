@@ -38,6 +38,22 @@
             app:destination="@id/startFragment"
             app:popUpTo="@id/startFragment"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_imageFragment_to_successFragment"
+            app:destination="@id/successFragment"/>
     </fragment>
+
+    <fragment
+        android:id="@+id/successFragment"
+        android:name="com.example.nanotypos.SuccessFragment"
+        android:label="QR Code Information"
+        tools:layout="@layout/fragment_success" >
+        <action
+            android:id="@+id/action_successFragment_to_startFragment"
+            app:destination="@id/startFragment"
+            app:popUpTo="@id/startFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
 
 </navigation>

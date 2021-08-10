@@ -10,7 +10,6 @@ import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -82,7 +81,6 @@ class StartFragment : Fragment() {
 
     //function to launch intent to open camera and capture an image
     fun captureImage() {
-        Toast.makeText(activity, "Open Camera pressed!",Toast.LENGTH_SHORT).show()
         val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         if (context?.let { takePictureIntent.resolveActivity(it.packageManager) } != null) {
                 // Create the File where the photo should go
