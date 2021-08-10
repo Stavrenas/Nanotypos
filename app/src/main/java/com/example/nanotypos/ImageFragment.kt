@@ -103,6 +103,7 @@ class ImageFragment: Fragment() {
             //get instance of barcode scanner
             val scanner = BarcodeScanning.getClient()
             //Process the image
+            var found = false
             val result = scanner.process(image)
                 .addOnSuccessListener { barcodes ->
                     for (barcode in barcodes) {
@@ -121,11 +122,10 @@ class ImageFragment: Fragment() {
                             }
                             Barcode.TYPE_URL -> {
                                 //val title = barcode.url!!.title
-                                val url = barcode.url!!.url
+                                //val url = barcode.url!!.url
                                 sharedViewModel.setBarcode(barcode)
                                 sharedViewModel.setTextValue(getString(R.string.QR_success))
-                                val text = getString(R.string.QR_success)
-
+                                found = true
                                 findNavController().navigate(R.id.action_imageFragment_to_successFragment)
                             }
                             Barcode.TYPE_TEXT ->{
@@ -137,11 +137,13 @@ class ImageFragment: Fragment() {
                     }
                     // Task completed successfully
                     // ...
+                    if(!found)
+                        Toast.makeText(activity, "No QR code found", Toast.LENGTH_SHORT).show()
                 }
                 .addOnFailureListener {
                     // Task failed with an exception
                     // ...
-                    Toast.makeText(activity, "No QR code found", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(activity, "Error :(", Toast.LENGTH_SHORT).show()
                 }
 
         } catch (e: IOException) {
