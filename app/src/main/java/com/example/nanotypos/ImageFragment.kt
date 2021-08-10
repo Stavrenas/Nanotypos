@@ -2,6 +2,7 @@ package com.example.nanotypos
 
 import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -12,12 +13,12 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.example.nanotypos.data.ViewModel
 import com.example.nanotypos.databinding.FragmentImageBinding
-import com.google.mlkit.common.model.LocalModel
 import com.google.mlkit.vision.barcode.Barcode
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.common.InputImage
-import com.google.mlkit.vision.objects.ObjectDetection
-import com.google.mlkit.vision.objects.custom.CustomObjectDetectorOptions
+import org.tensorflow.lite.support.image.TensorImage
+import org.tensorflow.lite.task.vision.detector.Detection
+import org.tensorflow.lite.task.vision.detector.ObjectDetector
 import java.io.IOException
 
 class ImageFragment: Fragment() {
@@ -49,6 +50,7 @@ class ImageFragment: Fragment() {
         binding = null
     }
 
+    /*
     fun searchForLogo(){
         val localModel = LocalModel.Builder()
             .setAssetFilePath("model.tflite")
@@ -94,6 +96,67 @@ class ImageFragment: Fragment() {
             e.printStackTrace()
         }
     }
+    */
+
+
+    fun searchForLogo (){
+        val uri: Uri? = sharedViewModel.getModelUri()
+        //val image: InputImage
+
+        // Initialization
+        val options: ObjectDetector.ObjectDetectorOptions =
+            ObjectDetector.ObjectDetectorOptions.builder().setMaxResults(1).build()
+        val objectDetector: ObjectDetector =
+            ObjectDetector.createFromFileAndOptions(context, "model.tflite", options)
+        try {
+            //image = InputImage.fromFilePath(context, uri)
+            val bitmap = MediaStore.Images.Media.getBitmap(activity?.contentResolver, uri)
+            val tensorImage = TensorImage.fromBitmap(bitmap)
+            // Run inference
+            val results: List<Detection> = objectDetector.detect(tensorImage)
+            for (detectedObject in results) {
+                val boundingBox = detectedObject.boundingBox
+                Log.d("LOGO", " boundingBox: (${boundingBox.left}, ${boundingBox.top}) - (${boundingBox.right},${boundingBox.bottom})")
+                Toast.makeText(activity," boundingBox: (${boundingBox.left}, ${boundingBox.top}) - (${boundingBox.right},${boundingBox.bottom})", Toast.LENGTH_SHORT).show()
+                for (category in detectedObject.categories){
+                    val label = category.label
+                    val score = category.score
+                    Log.d("LOGO", "Label is $label")
+                    Log.d("LOGO", "Score is $score")
+                    Toast.makeText(activity, "Label is $label", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(activity,"Score is $score", Toast.LENGTH_SHORT).show()
+                }
+
+            }
+            //val result = objectDetector.detect(tensorImage)
+
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+    }
+
+
+    /*
+    fun searchForLogo(){
+        val model = Model.newInstance(context)
+        val bitmap = MediaStore.Images.Media.getBitmap(activity?.contentResolver, uri)
+        // Creates inputs for reference.
+        val image = TensorImage.fromBitmap(bitmap)
+
+        // Runs model inference and gets result.
+        val outputs = model.process(image)
+        val detectionResult = outputs.detectionResultList.get(0)
+
+        // Gets result from DetectionResult.
+        val location = detectionResult.locationAsRectF;
+        val category = detectionResult.categoryAsString;
+        val score = detectionResult.scoreAsFloat;
+
+        // Releases model resources if no longer used.
+        model.close()
+    }
+
+     */
 
     fun searchForQR(){
         val uri: Uri? = sharedViewModel.getModelUri()
@@ -102,10 +165,10 @@ class ImageFragment: Fragment() {
             image = InputImage.fromFilePath(context, uri)
             //get instance of barcode scanner
             val scanner = BarcodeScanning.getClient()
+            var foundCode = false
             //Process the image
-            var found = false
-            val result = scanner.process(image)
-                .addOnSuccessListener { barcodes ->
+            //val result = scanner...
+            scanner.process(image).addOnSuccessListener { barcodes ->
                     for (barcode in barcodes) {
                         //Get information from barcodes
 
@@ -125,7 +188,7 @@ class ImageFragment: Fragment() {
                                 //val url = barcode.url!!.url
                                 sharedViewModel.setBarcode(barcode)
                                 sharedViewModel.setTextValue(getString(R.string.QR_success))
-                                found = true
+                                foundCode = true
                                 findNavController().navigate(R.id.action_imageFragment_to_successFragment)
                             }
                             Barcode.TYPE_TEXT ->{
@@ -137,7 +200,9 @@ class ImageFragment: Fragment() {
                     }
                     // Task completed successfully
                     // ...
-                    if(!found)
+
+                    //Display toast if QR is not found
+                    if(!foundCode)
                         Toast.makeText(activity, "No QR code found", Toast.LENGTH_SHORT).show()
                 }
                 .addOnFailureListener {

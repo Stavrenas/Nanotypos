@@ -28,6 +28,7 @@ android {
 
     buildFeatures {
         dataBinding true
+        mlModelBinding true
     }
 
     compileOptions {
@@ -38,8 +39,7 @@ android {
         jvmTarget = '1.8'
     }
     aaptOptions {
-        noCompress "tflite"
-        // or noCompress "lite"
+        noCompress 'tflite'
     }
 }
 
