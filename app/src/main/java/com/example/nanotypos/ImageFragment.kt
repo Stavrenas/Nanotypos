@@ -50,7 +50,6 @@ class ImageFragment: Fragment() {
     }
 
     fun searchForLogo(){
-        Toast.makeText(activity, "Search for Logo pressed!", Toast.LENGTH_SHORT).show()
         val localModel = LocalModel.Builder()
             .setAssetFilePath("model.tflite")
             .build()
@@ -97,7 +96,6 @@ class ImageFragment: Fragment() {
     }
 
     fun searchForQR(){
-        Toast.makeText(activity, "Searching for QR!", Toast.LENGTH_SHORT).show()
         val uri: Uri? = sharedViewModel.getModelUri()
         val image: InputImage
         try {
@@ -123,13 +121,17 @@ class ImageFragment: Fragment() {
                             }
                             Barcode.TYPE_URL -> {
                                 //val title = barcode.url!!.title
-                                //val url = barcode.url!!.url
+                                val url = barcode.url!!.url
                                 sharedViewModel.setBarcode(barcode)
-                                findNavController().navigate(R.id.action_imageFragment_to_startFragment)
+                                sharedViewModel.setTextValue(getString(R.string.QR_success))
+                                val text = getString(R.string.QR_success)
+
+                                findNavController().navigate(R.id.action_imageFragment_to_successFragment)
                             }
                             Barcode.TYPE_TEXT ->{
                                 sharedViewModel.setBarcode(barcode)
-                                findNavController().navigate(R.id.action_imageFragment_to_startFragment)
+                                sharedViewModel.setTextValue(getString(R.string.QR_failure))
+                                findNavController().navigate(R.id.action_imageFragment_to_successFragment)
                             }
                         }
                     }

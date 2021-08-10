@@ -19,6 +19,10 @@ class ViewModel : ViewModel() {
     private val _barcode = MutableLiveData<Barcode>()
     val barcode: LiveData<Barcode> = _barcode
 
+
+    private val _text=MutableLiveData<String>()
+    val text: LiveData<String> = _text
+
     fun setModelUri(targetUri: Uri){
         _uri.value = targetUri
     }
@@ -41,6 +45,18 @@ class ViewModel : ViewModel() {
 
     fun setBarcode(bar: Barcode){
         _barcode.value = bar
+    }
+
+    fun setTextValue(str: String){
+        _text.value = str
+    }
+
+    fun getUrl(): String {
+        return _barcode.value?.url!!.url
+    }
+
+    fun getTextValue(): String? {
+        return _text.value
     }
 
 
