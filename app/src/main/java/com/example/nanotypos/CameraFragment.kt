@@ -307,8 +307,8 @@ override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
                                         for (barcode in barcodes) {
                                             //Get information from barcodes
                                             val bounds = barcode.boundingBox
-                                            val corners = barcode.cornerPoints
-                                            val rawValue = barcode.rawValue
+                                            //val corners = barcode.cornerPoints
+                                            //val rawValue = barcode.rawValue
                                             /*
                                             val rect = RectF(barcode.boundingBox)
                                             rect.left = translateX(rect.left)
@@ -322,7 +322,7 @@ override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
                                             // See API reference for complete list of supported types
                                             when (barcode.valueType) {
                                                 Barcode.TYPE_URL -> {
-                                                    val title = barcode.url!!.title
+                                                    //val title = barcode.url!!.title
                                                     val url = barcode.url!!.url
                                                     //Log.d("QR", "Title is $title")
                                                     Log.d("QR", "Url is $url")
