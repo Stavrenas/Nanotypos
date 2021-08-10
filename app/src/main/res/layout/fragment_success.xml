@@ -2,16 +2,15 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/successFragment"
     tools:context=".SuccessFragment">
 
     <data>
         <variable
-            name="successFragment"
-            type="com.example.nanotypos.SuccessFragment" />
-        <variable
             name="viewModel"
             type="com.example.nanotypos.data.ViewModel" />
+        <variable
+            name="successFragment"
+            type="com.example.nanotypos.SuccessFragment" />
     </data>
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import com.example.nanotypos.data.ViewModel
 import com.example.nanotypos.databinding.FragmentImageBinding
 import com.google.mlkit.common.model.LocalModel
@@ -109,21 +110,26 @@ class ImageFragment: Fragment() {
                     for (barcode in barcodes) {
                         //Get information from barcodes
 
-                        val bounds = barcode.boundingBox
-                        val corners = barcode.cornerPoints
-                        val rawValue = barcode.rawValue
+                        //val bounds = barcode.boundingBox
+                        //val corners = barcode.cornerPoints
+                        //val rawValue = barcode.rawValue
 
                         // See API reference for complete list of supported types
                         when (barcode.valueType) {
                             Barcode.TYPE_WIFI -> {
-                                val ssid = barcode.wifi!!.ssid
-                                val password = barcode.wifi!!.password
-                                val type = barcode.wifi!!.encryptionType
+                                //val ssid = barcode.wifi!!.ssid
+                                //val password = barcode.wifi!!.password
+                                //val type = barcode.wifi!!.encryptionType
                             }
                             Barcode.TYPE_URL -> {
-                                val title = barcode.url!!.title
-                                val url = barcode.url!!.url
-                                Toast.makeText(activity, "Url is $url", Toast.LENGTH_SHORT).show()
+                                //val title = barcode.url!!.title
+                                //val url = barcode.url!!.url
+                                sharedViewModel.setBarcode(barcode)
+                                findNavController().navigate(R.id.action_imageFragment_to_startFragment)
+                            }
+                            Barcode.TYPE_TEXT ->{
+                                sharedViewModel.setBarcode(barcode)
+                                findNavController().navigate(R.id.action_imageFragment_to_startFragment)
                             }
                         }
                     }

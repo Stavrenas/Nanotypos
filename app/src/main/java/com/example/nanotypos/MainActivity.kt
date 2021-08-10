@@ -11,9 +11,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main)  {
 
     private lateinit var navController: NavController
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
 
         val navHostFragment = supportFragmentManager
@@ -21,14 +19,11 @@ class MainActivity : AppCompatActivity(R.layout.activity_main)  {
         navController = navHostFragment.navController
 
         setupActionBarWithNavController(navController)
-
     }
 
     override fun onSupportNavigateUp(): Boolean {
         return navController.navigateUp() || super.onSupportNavigateUp()
     }
-
-
 
 
 }

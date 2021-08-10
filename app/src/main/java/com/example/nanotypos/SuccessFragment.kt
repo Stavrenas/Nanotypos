@@ -9,8 +9,8 @@ import androidx.fragment.app.activityViewModels
 import com.example.nanotypos.data.ViewModel
 import com.example.nanotypos.databinding.FragmentSuccessBinding
 
-class SuccessFragment: Fragment() {
 
+class SuccessFragment: Fragment() {
 
     private val sharedViewModel: ViewModel by activityViewModels()
     private var binding: FragmentSuccessBinding? = null
@@ -24,15 +24,9 @@ class SuccessFragment: Fragment() {
         return fragmentBinding.root
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        binding = null
-    }
-
-
-    /*
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding?.successFragment = this
 
         binding?.apply {
             lifecycleOwner = viewLifecycleOwner
@@ -40,7 +34,12 @@ class SuccessFragment: Fragment() {
             successFragment = this@SuccessFragment
         }
     }
-*/
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        binding = null
+    }
+
 
 
 }
