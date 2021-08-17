@@ -57,55 +57,6 @@ class ImageFragment: Fragment() {
         binding = null
     }
 
-    /*
-    fun searchForLogo(){
-        val localModel = LocalModel.Builder()
-            .setAssetFilePath("model.tflite")
-            .build()
-        val uri: Uri? = sharedViewModel.getModelUri()
-        val image: InputImage
-        // Detection and tracking
-        val customObjectDetectorOptions =
-            CustomObjectDetectorOptions.Builder(localModel)
-                .setDetectorMode(CustomObjectDetectorOptions.SINGLE_IMAGE_MODE)
-                .enableClassification()
-                .setClassificationConfidenceThreshold(0.5f)
-                .setMaxPerObjectLabelCount(1)
-                .build()
-
-        val objectDetector =ObjectDetection.getClient(customObjectDetectorOptions)
-        try {
-            image = InputImage.fromFilePath(context, uri)
-            objectDetector.process(image)
-                .addOnFailureListener { e ->
-                    Log.d("LOGO", "error is $e")
-                }
-
-                .addOnSuccessListener{results ->
-                    for (detectedObject in results) {
-                        val boundingBox = detectedObject.boundingBox
-                        val trackingId = detectedObject.trackingId
-                        for (label in detectedObject.labels) {
-                            val text = label.text
-                            val index = label.index
-                            val confidence = label.confidence
-                            Log.d("LOGO", "text is $text")
-                            Log.d("LOGO", "index is $index")
-                            Log.d("LOGO", "confidence is $confidence")
-                            Toast.makeText(activity, "confidence is $confidence", Toast.LENGTH_SHORT).show()
-                        }
-                        Log.d("LOGO", "trackingId is $trackingId")
-                        Log.d("LOGO", " boundingBox: (${boundingBox.left}, ${boundingBox.top}) - (${boundingBox.right},${boundingBox.bottom})")
-                    }
-                }
-
-        } catch (e: IOException) {
-            e.printStackTrace()
-        }
-    }
-    */
-
-
     fun searchForLogo() {
         val uri: Uri? = sharedViewModel.getModelUri()
         //val image: InputImage
@@ -126,25 +77,15 @@ class ImageFragment: Fragment() {
 
                 val boundingBox = detectedObject.boundingBox
 
-                Log.d(
-                    "LOGO",
-                    " boundingBox: (${boundingBox.left}, ${boundingBox.top}) - (${boundingBox.right},${boundingBox.bottom})"
-                )
-                Toast.makeText(
-                    activity,
-                    " boundingBox: (${boundingBox.left}, ${boundingBox.top}) - (${boundingBox.right},${boundingBox.bottom})",
-                    Toast.LENGTH_SHORT
-                ).show()
+                Log.d("LOGO"," boundingBox: (${boundingBox.left}, ${boundingBox.top}) - (${boundingBox.right},${boundingBox.bottom})")
+                Toast.makeText(activity," boundingBox: (${boundingBox.left}, ${boundingBox.top}) - (${boundingBox.right},${boundingBox.bottom})",Toast.LENGTH_SHORT).show()
 
                 for (category in detectedObject.categories) {
                     val label = category.label
                     val score = category.score
+
                     Log.d("LOGO", "Label is $label and score is $score ")
-                    Toast.makeText(
-                        activity,
-                        "Label is $label and score is $score",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(activity,"Label is $label and score is $score",Toast.LENGTH_SHORT).show()
 
                     val imgWithResult = drawDetectionResult(bitmap, detectedObject)
                     binding?.targetImage?.setImageBitmap(imgWithResult)
@@ -172,7 +113,6 @@ class ImageFragment: Fragment() {
             pen.style = Paint.Style.STROKE
             val box = detectionResult.boundingBox
             canvas.drawRect(box, pen)
-
 
             val tagSize = Rect(0, 0, 0, 0)
 
@@ -204,27 +144,6 @@ class ImageFragment: Fragment() {
     }
 
 
-    /*
-    fun searchForLogo(){
-        val model = Model.newInstance(context)
-        val bitmap = MediaStore.Images.Media.getBitmap(activity?.contentResolver, uri)
-        // Creates inputs for reference.
-        val image = TensorImage.fromBitmap(bitmap)
-
-        // Runs model inference and gets result.
-        val outputs = model.process(image)
-        val detectionResult = outputs.detectionResultList.get(0)
-
-        // Gets result from DetectionResult.
-        val location = detectionResult.locationAsRectF;
-        val category = detectionResult.categoryAsString;
-        val score = detectionResult.scoreAsFloat;
-
-        // Releases model resources if no longer used.
-        model.close()
-    }
-
-     */
 
     fun searchForQR() {
         val uri: Uri? = sharedViewModel.getModelUri()
@@ -240,7 +159,6 @@ class ImageFragment: Fragment() {
                 for (barcode in barcodes) {
                     //Get information from barcodes
 
-                    //val bounds = barcode.boundingBox
                     //val corners = barcode.cornerPoints
                     //val rawValue = barcode.rawValue
 
