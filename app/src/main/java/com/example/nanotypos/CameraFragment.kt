@@ -2,8 +2,8 @@ package com.example.nanotypos
 
 import android.Manifest
 import android.content.pm.PackageManager
-import android.graphics.Rect
-import android.graphics.RectF
+import android.graphics.*
+import android.media.Image
 import android.os.Bundle
 import android.util.Log
 import android.util.Size
@@ -21,11 +21,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.example.nanotypos.data.ViewModel
 import com.example.nanotypos.databinding.FragmentCameraBinding
-import com.google.android.material.snackbar.Snackbar
 import com.google.common.util.concurrent.ListenableFuture
-import com.google.mlkit.vision.barcode.Barcode
-import com.google.mlkit.vision.barcode.BarcodeScanning
-import com.google.mlkit.vision.common.InputImage
+import org.tensorflow.lite.support.image.TensorImage
+import org.tensorflow.lite.task.vision.detector.Detection
+import org.tensorflow.lite.task.vision.detector.ObjectDetector
+import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -45,203 +45,6 @@ class CameraFragment: Fragment(R.layout.fragment_camera) {
 
     private var lensFacing: Int = CameraSelector.LENS_FACING_BACK
 
-/*
-    override fun onCreateView(
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentCameraBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
-/*
-override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
-
-        cameraProviderFuture.addListener({
-            val cameraProvider = cameraProviderFuture.get()
-            //bindPreview(cameraProvider)
-            })
-            }
- */
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        cameraExecutor = Executors.newSingleThreadExecutor()
-    }
-
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        startCamera()
-    }
-
-    private fun bindPreview(cameraProvider: ProcessCameraProvider) {
-        val preview = Preview.Builder().apply {
-            setTargetResolution(Size(binding.viewFinder.width, binding.viewFinder.height))
-        }.build()
-
-        val cameraSelector: CameraSelector = CameraSelector.Builder()
-            .requireLensFacing(CameraSelector.LENS_FACING_BACK).build()
-
-        preview.setSurfaceProvider(binding.viewFinder.surfaceProvider)
-
-        val imageAnalysis = ImageAnalysis.Builder()
-            .setTargetResolution(Size(1280, 720))
-            .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-            .build()
-        imageAnalysis.setAnalyzer(cameraExecutor, { input ->
-            @androidx.camera.core.ExperimentalGetImage
-            val mediaImage = input.image
-
-            @androidx.camera.core.ExperimentalGetImage
-            val inImage =
-                InputImage.fromMediaImage(mediaImage!!, input.imageInfo.rotationDegrees)
-            try {
-                val scanner = BarcodeScanning.getClient()
-                //Process the image
-                @androidx.camera.core.ExperimentalGetImage
-                val result = scanner.process(inImage).addOnSuccessListener { barcodes ->
-                    for (barcode in barcodes) {
-                        //Get information from barcodes
-                        val bounds = barcode.boundingBox
-                        val corners = barcode.cornerPoints
-                        val rawValue = barcode.rawValue
-
-                        // See API reference for complete list of supported types
-                        when (barcode.valueType) {
-                            Barcode.TYPE_WIFI -> {
-                                val ssid = barcode.wifi!!.ssid
-                                val password = barcode.wifi!!.password
-                                val type = barcode.wifi!!.encryptionType
-                            }
-                            Barcode.TYPE_URL -> {
-                                val title = barcode.url!!.title
-                                val url = barcode.url!!.url
-                                Toast.makeText(activity, "Url is $url", Toast.LENGTH_SHORT).show()
-                            }
-                        }
-                    }
-                    // Task completed successfully
-                    // ...
-                }
-                    .addOnFailureListener {
-                        // Task failed with an exception
-                        // ...
-                        Toast.makeText(activity, "No QR found", Toast.LENGTH_SHORT).show()
-                    }
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
-        })
-        val camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageAnalysis)
-
-    }
-
-    private fun startCamera() {
-
-        // Initialize the Preview object, get a surface provider from your PreviewView,
-        // and set it on the preview instance..
-        val preview = Preview.Builder().apply {
-            setTargetResolution(Size(binding.viewFinder.width, binding.viewFinder.height))
-        }.build()
-
-        val cameraSelector: CameraSelector = CameraSelector.Builder()
-            .requireLensFacing(CameraSelector.LENS_FACING_BACK).build()
-
-        // Create an instance of the ProcessCameraProvider,
-        // which will be used to bind the use cases to a lifecycle owner
-        val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
-
-        preview.setSurfaceProvider(binding.viewFinder.surfaceProvider)
-        // Add a listener to the cameraProviderFuture.
-        // The first argument is a Runnable, which will be where the magic actually happens.
-        // The second argument (way down below) is an Executor that runs on the main thread.
-        cameraProviderFuture.addListener({
-            // Add a ProcessCameraProvider, which binds the lifecycle of your camera to
-            // the LifecycleOwner within the application's life.
-            val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
-
-
-            // Setup the ImageAnalyzer for the ImageAnalysis use case
-            val imageAnalysis = ImageAnalysis.Builder()
-                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                .build()
-            imageAnalysis.setAnalyzer(cameraExecutor, { input ->
-                @androidx.camera.core.ExperimentalGetImage
-                val mediaImage = input.image
-
-                @androidx.camera.core.ExperimentalGetImage
-                val inImage =
-                    InputImage.fromMediaImage(mediaImage!!, input.imageInfo.rotationDegrees)
-                try {
-                    val scanner = BarcodeScanning.getClient()
-                    //Process the image
-                    @androidx.camera.core.ExperimentalGetImage
-                    val result = scanner.process(inImage).addOnSuccessListener { barcodes ->
-                        for (barcode in barcodes) {
-                            //Get information from barcodes
-                            val bounds = barcode.boundingBox
-                            val corners = barcode.cornerPoints
-                            val rawValue = barcode.rawValue
-
-                            // See API reference for complete list of supported types
-                            when (barcode.valueType) {
-                                Barcode.TYPE_WIFI -> {
-                                    val ssid = barcode.wifi!!.ssid
-                                    val password = barcode.wifi!!.password
-                                    val type = barcode.wifi!!.encryptionType
-                                }
-                                Barcode.TYPE_URL -> {
-                                    val title = barcode.url!!.title
-                                    val url = barcode.url!!.url
-                                    Toast.makeText(activity, "Url is $url", Toast.LENGTH_SHORT).show()
-                                }
-                            }
-                        }
-                        // Task completed successfully
-                    }
-                        .addOnFailureListener {
-                            // Task failed with an exception
-                            Toast.makeText(activity, "No QR found", Toast.LENGTH_SHORT).show()
-                        }
-                } catch (e: IOException) {
-                    e.printStackTrace()
-                }
-            })
-
-            try {
-                // Unbind any bound use cases before rebinding
-                cameraProvider.unbindAll()
-                // Bind use cases to lifecycleOwner
-                cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageAnalysis)
-            } catch (e: Exception) {
-                Log.e("PreviewUseCase", "Binding failed!", e)
-            }
-        }, ContextCompat.getMainExecutor(requireContext()))
-    }
-
-    fun searchLogoPreview() {
-        Toast.makeText(context, "Search for Logo selected!", Toast.LENGTH_SHORT).show()
-        view?.let { Snackbar.make(it, "Search for Logo selected!", Snackbar.LENGTH_SHORT).show() }
-        sharedViewModel.toggleLogoButton()
-    }
-
-    fun searchQRPreview() {
-        Toast.makeText(activity, "Search for QR selected!", Toast.LENGTH_SHORT).show()
-        view?.let { Snackbar.make(it, "Search for QR selected!", Snackbar.LENGTH_SHORT).show() }
-        Log.d("TOAST", "MESSAGE")
-        sharedViewModel.toggleLogoButton()
-    }
-
-    */
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -256,6 +59,7 @@ override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         return binding.root
     }
 
+    @androidx.camera.core.ExperimentalGetImage
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (allPermissionsGranted()) {
@@ -267,7 +71,7 @@ override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
             )
         }
     }
-
+    @androidx.camera.core.ExperimentalGetImage
     private fun startCamera() {
         // Create an instance of the ProcessCameraProvider,
         // which will be used to bind the use cases to a lifecycle owner.
@@ -287,65 +91,56 @@ override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
                 setTargetResolution(Size(binding.viewFinder.width, binding.viewFinder.height))
             }.build()
 
+            val options: ObjectDetector.ObjectDetectorOptions =
+                ObjectDetector.ObjectDetectorOptions.builder().setMaxResults(1).setScoreThreshold(0.1f).build()
+
+            val objectDetector: ObjectDetector =
+                ObjectDetector.createFromFileAndOptions(context, "model.tflite", options)
             preview.setSurfaceProvider(binding.viewFinder.surfaceProvider)
+
             // Setup the ImageAnalyzer for the ImageAnalysis use case
             val imageAnalysis = ImageAnalysis.Builder().setBackpressureStrategy(STRATEGY_KEEP_ONLY_LATEST)
                 .build()
                 .also {
                     it.setAnalyzer(cameraExecutor, { input ->
-                            @androidx.camera.core.ExperimentalGetImage
-                            val mediaImage = input.image
-                            @androidx.camera.core.ExperimentalGetImage
-                            val inImage =
-                                InputImage.fromMediaImage(mediaImage!!, input.imageInfo.rotationDegrees)
-                            try {
-                                val scanner = BarcodeScanning.getClient()
-                                //Process the image
-                                @androidx.camera.core.ExperimentalGetImage
-                                val result =
-                                    scanner.process(inImage).addOnSuccessListener { barcodes ->
-                                        for (barcode in barcodes) {
-                                            //Get information from barcodes
-                                            val bounds = barcode.boundingBox
-                                            //val corners = barcode.cornerPoints
-                                            //val rawValue = barcode.rawValue
-                                            /*
-                                            val rect = RectF(barcode.boundingBox)
-                                            rect.left = translateX(rect.left)
-                                            rect.top = translateY(rect.top)
-                                            rect.right = translateX(rect.right)
-                                            rect.bottom = translateY(rect.bottom)
-                                            canvas.drawRect(rect, mRectPaint)
+                        try {
+                            //image = InputImage.fromFilePath(context, uri)
 
-                                             */
+                            val bitmap = input.image?.toBitmap()
+                            val tensorImage = TensorImage.fromBitmap(bitmap)
 
-                                            // See API reference for complete list of supported types
-                                            when (barcode.valueType) {
-                                                Barcode.TYPE_URL -> {
-                                                    //val title = barcode.url!!.title
-                                                    val url = barcode.url!!.url
-                                                    //Log.d("QR", "Title is $title")
-                                                    Log.d("QR", "Url is $url")
-                                                    drawRect(bounds)
-                                                }
+                                // Run inference
+                            val results: List<Detection> = objectDetector.detect(tensorImage)
+                            for (detectedObject in results) {
 
-                                            }
+                                val boundingBox = detectedObject.boundingBox
 
-                                        }
-                                        input.close()
-                                    }
+                                //Log.d("LOGO"," boundingBox: (${boundingBox.left}, ${boundingBox.top}) - (${boundingBox.right},${boundingBox.bottom})")
+                                //Toast.makeText(activity," boundingBox: (${boundingBox.left}, ${boundingBox.top}) - (${boundingBox.right},${boundingBox.bottom})",Toast.LENGTH_SHORT).show()
 
-                                        .addOnFailureListener {
-                                            // Task failed with an exception
-                                            input.close()
+                                for (category in detectedObject.categories) {
+                                    //val label = category.label
+                                    val score = category.score
 
-                                            Toast.makeText(activity, "No QR found", Toast.LENGTH_SHORT).show()
+                                    Log.d("LOGO", "Score is $score (${boundingBox.left}, ${boundingBox.top}) - (${boundingBox.right},${boundingBox.bottom}) ")
+                                    val niceBox = mapOutputCoordinates(boundingBox)
+                                    drawRect(niceBox)
+                                    //Toast.makeText(activity,"Label is $label and score is $score",Toast.LENGTH_SHORT).show()
+                                    /*
+                                    val imgWithResult = drawDetectionResult(bitmap, detectedObject)
+                                    binding?.targetImage?.setImageBitmap(imgWithResult)
+                                    */
 
-                                        }
-                            } catch (e: IOException) {
-                                e.printStackTrace()
-                                Toast.makeText(context, "Error!", Toast.LENGTH_SHORT).show()
+                                    //sharedViewModel.setModelUri(imgWithResult)
+                                }
+
+
                             }
+                        } catch (e: IOException) {
+                            e.printStackTrace()
+                        }
+                        input.close()
+
                     })
                 }
             try {
@@ -359,12 +154,32 @@ override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         }, ContextCompat.getMainExecutor(requireContext()))
     }
 
+    private fun Image.toBitmap(): Bitmap {
+        val yBuffer = planes[0].buffer // Y
+        val vuBuffer = planes[2].buffer // VU
+
+        val ySize = yBuffer.remaining()
+        val vuSize = vuBuffer.remaining()
+
+        val nv21 = ByteArray(ySize + vuSize)
+
+        yBuffer.get(nv21, 0, ySize)
+        vuBuffer.get(nv21, ySize, vuSize)
+
+        val yuvImage = YuvImage(nv21, ImageFormat.NV21, this.width, this.height, null)
+        val out = ByteArrayOutputStream()
+        yuvImage.compressToJpeg(Rect(0, 0, yuvImage.width, yuvImage.height), 50, out)
+        val imageBytes = out.toByteArray()
+        return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+    }
+
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
         ContextCompat.checkSelfPermission(
             requireContext(), it
         ) == PackageManager.PERMISSION_GRANTED
     }
 
+    @androidx.camera.core.ExperimentalGetImage
     override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<String>, grantResults:
         IntArray
@@ -388,7 +203,7 @@ override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onDestroy()
     }
 
-    fun drawRect(rectangle: Rect) = binding.viewFinder.post {
+    private fun drawRect(rectangle: RectF) = binding.viewFinder.post {
 
         val rect = RectF(rectangle)
         val location = mapOutputCoordinates(rect)
@@ -402,7 +217,7 @@ override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
             //Log.d("QR", "leftMargin is $leftMargin")
             //Log.d("QR", "width is $width")
             //Log.d("QR", "height is $height")
-            Log.d("QR", " boundingBox: (${rect.left}, ${rect.top}) - (${rect.right},${rect.bottom})")
+            //Log.d("QR", " boundingBox: (${rect.left}, ${rect.top}) - (${rect.right},${rect.bottom})")
         }
 
         binding.boxPrediction.visibility = View.VISIBLE
@@ -414,18 +229,6 @@ override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         private const val REQUEST_CODE_PERMISSIONS = 10
     }
 
-    fun searchLogoPreview() {
-        Toast.makeText(context, "Search for Logo selected!", Toast.LENGTH_SHORT).show()
-        view?.let { Snackbar.make(it, "Search for Logo selected!", Snackbar.LENGTH_SHORT).show() }
-        sharedViewModel.toggleLogoButton()
-    }
-
-    fun searchQRPreview() {
-        Toast.makeText(activity, "Search for QR selected!", Toast.LENGTH_SHORT).show()
-        view?.let { Snackbar.make(it, "Search for QR selected!", Snackbar.LENGTH_SHORT).show() }
-        Log.d("TOAST", "MESSAGE")
-        sharedViewModel.toggleLogoButton()
-    }
 
     /**
      * Helper function used to map the coordinates for objects coming out of

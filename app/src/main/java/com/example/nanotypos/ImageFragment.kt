@@ -85,7 +85,7 @@ class ImageFragment: Fragment() {
                     val score = category.score
 
                     Log.d("LOGO", "Label is $label and score is $score ")
-                    Toast.makeText(activity,"Label is $label and score is $score",Toast.LENGTH_SHORT).show()
+                    //Toast.makeText(activity,"Label is $label and score is $score",Toast.LENGTH_SHORT).show()
 
                     val imgWithResult = drawDetectionResult(bitmap, detectedObject)
                     binding?.targetImage?.setImageBitmap(imgWithResult)
