@@ -98,6 +98,8 @@ class CameraFragment: Fragment(R.layout.fragment_camera) {
                 ObjectDetector.createFromFileAndOptions(context, "model.tflite", options)
             preview.setSurfaceProvider(binding.viewFinder.surfaceProvider)
 
+            var textValue = ""
+
             // Setup the ImageAnalyzer for the ImageAnalysis use case
             val imageAnalysis = ImageAnalysis.Builder().setBackpressureStrategy(STRATEGY_KEEP_ONLY_LATEST)
                 .build()
@@ -109,7 +111,7 @@ class CameraFragment: Fragment(R.layout.fragment_camera) {
                             val bitmap = input.image?.toBitmap()
                             val tensorImage = TensorImage.fromBitmap(bitmap)
 
-                                // Run inference
+                            // Run inference
                             val results: List<Detection> = objectDetector.detect(tensorImage)
                             for (detectedObject in results) {
 
@@ -121,8 +123,16 @@ class CameraFragment: Fragment(R.layout.fragment_camera) {
                                 for (category in detectedObject.categories) {
                                     //val label = category.label
                                     val score = category.score
+                                    textValue = "Score is $score"
 
-                                    Log.d("LOGO", "Score is $score (${boundingBox.left}, ${boundingBox.top}) - (${boundingBox.right},${boundingBox.bottom}) ")
+                                    activity?.runOnUiThread {
+                                        binding.scoreText.setText(textValue)
+                                    }
+
+                                    Log.d(
+                                        "LOGO",
+                                        "Score is $score (${boundingBox.left}, ${boundingBox.top}) - (${boundingBox.right},${boundingBox.bottom}) "
+                                    )
                                     val niceBox = mapOutputCoordinates(boundingBox)
                                     drawRect(niceBox)
                                     //Toast.makeText(activity,"Label is $label and score is $score",Toast.LENGTH_SHORT).show()
@@ -136,9 +146,11 @@ class CameraFragment: Fragment(R.layout.fragment_camera) {
 
 
                             }
+
                         } catch (e: IOException) {
                             e.printStackTrace()
                         }
+
                         input.close()
 
                     })
