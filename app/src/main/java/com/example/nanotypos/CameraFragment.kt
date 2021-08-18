@@ -1,10 +1,12 @@
 package com.example.nanotypos
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.*
 import android.media.Image
 import android.os.Bundle
+import android.util.AttributeSet
 import android.util.Log
 import android.util.Size
 import android.view.LayoutInflater
@@ -29,7 +31,6 @@ import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import kotlin.math.min
 
 
 class CameraFragment: Fragment(R.layout.fragment_camera) {
@@ -37,13 +38,17 @@ class CameraFragment: Fragment(R.layout.fragment_camera) {
 
     private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
     private lateinit var cameraExecutor: ExecutorService
-
+    private var lensFacing: Int = CameraSelector.LENS_FACING_BACK
     private val sharedViewModel: ViewModel by activityViewModels()
 
     private var _binding: FragmentCameraBinding? = null
     private val binding get() = _binding!!
 
-    private var lensFacing: Int = CameraSelector.LENS_FACING_BACK
+
+    companion object {
+        private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
+        private const val REQUEST_CODE_PERMISSIONS = 10
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -90,15 +95,13 @@ class CameraFragment: Fragment(R.layout.fragment_camera) {
             val preview = Preview.Builder().apply {
                 setTargetResolution(Size(binding.viewFinder.width, binding.viewFinder.height))
             }.build()
+            preview.setSurfaceProvider(binding.viewFinder.surfaceProvider)
 
             val options: ObjectDetector.ObjectDetectorOptions =
                 ObjectDetector.ObjectDetectorOptions.builder().setMaxResults(1).setScoreThreshold(0.1f).build()
 
             val objectDetector: ObjectDetector =
                 ObjectDetector.createFromFileAndOptions(context, "model.tflite", options)
-            preview.setSurfaceProvider(binding.viewFinder.surfaceProvider)
-
-            var textValue = ""
 
             // Setup the ImageAnalyzer for the ImageAnalysis use case
             val imageAnalysis = ImageAnalysis.Builder().setBackpressureStrategy(STRATEGY_KEEP_ONLY_LATEST)
@@ -113,46 +116,26 @@ class CameraFragment: Fragment(R.layout.fragment_camera) {
 
                             // Run inference
                             val results: List<Detection> = objectDetector.detect(tensorImage)
-                            for (detectedObject in results) {
+                            val detectedObject = results.first()
+                            val obj = detectedObject.categories.first()
 
-                                val boundingBox = detectedObject.boundingBox
-
-                                //Log.d("LOGO"," boundingBox: (${boundingBox.left}, ${boundingBox.top}) - (${boundingBox.right},${boundingBox.bottom})")
-                                //Toast.makeText(activity," boundingBox: (${boundingBox.left}, ${boundingBox.top}) - (${boundingBox.right},${boundingBox.bottom})",Toast.LENGTH_SHORT).show()
-
-                                for (category in detectedObject.categories) {
-                                    //val label = category.label
-                                    val score = category.score
-                                    textValue = "Score is $score"
-
-                                    activity?.runOnUiThread {
-                                        binding.scoreText.setText(textValue)
-                                    }
-
-                                    Log.d(
-                                        "LOGO",
-                                        "Score is $score (${boundingBox.left}, ${boundingBox.top}) - (${boundingBox.right},${boundingBox.bottom}) "
-                                    )
-                                    val niceBox = mapOutputCoordinates(boundingBox)
-                                    drawRect(niceBox)
-                                    //Toast.makeText(activity,"Label is $label and score is $score",Toast.LENGTH_SHORT).show()
-                                    /*
-                                    val imgWithResult = drawDetectionResult(bitmap, detectedObject)
-                                    binding?.targetImage?.setImageBitmap(imgWithResult)
-                                    */
-
-                                    //sharedViewModel.setModelUri(imgWithResult)
-                                }
-
-
+                            val boundingBox = detectedObject.boundingBox
+                            val score = obj.score
+                            activity?.runOnUiThread {
+                                binding.scoreText.setText("Score is $score")
+                                binding.rectOverlay.post { binding.rectOverlay.drawRectangle(boundingBox) }
                             }
+
+                            Log.d(
+                                "LOGO",
+                                "Score is $score (${boundingBox.left}, ${boundingBox.top}) - (${boundingBox.right},${boundingBox.bottom}) "
+                            )
+
 
                         } catch (e: IOException) {
                             e.printStackTrace()
                         }
-
                         input.close()
-
                     })
                 }
             try {
@@ -215,31 +198,7 @@ class CameraFragment: Fragment(R.layout.fragment_camera) {
         super.onDestroy()
     }
 
-    private fun drawRect(rectangle: RectF) = binding.viewFinder.post {
 
-        val rect = RectF(rectangle)
-        val location = mapOutputCoordinates(rect)
-
-        (binding.boxPrediction.layoutParams as ViewGroup.MarginLayoutParams).apply {
-            topMargin = location.top.toInt()
-            leftMargin = location.left.toInt()
-            width = min(binding.viewFinder.width, location.right.toInt() - location.left.toInt())
-            height = min(binding.viewFinder.height, location.bottom.toInt() - location.top.toInt())
-            //Log.d("QR", "topMargin is $topMargin")
-            //Log.d("QR", "leftMargin is $leftMargin")
-            //Log.d("QR", "width is $width")
-            //Log.d("QR", "height is $height")
-            //Log.d("QR", " boundingBox: (${rect.left}, ${rect.top}) - (${rect.right},${rect.bottom})")
-        }
-
-        binding.boxPrediction.visibility = View.VISIBLE
-
-    }
-
-    companion object {
-        private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
-        private const val REQUEST_CODE_PERMISSIONS = 10
-    }
 
 
     /**
@@ -291,4 +250,24 @@ class CameraFragment: Fragment(R.layout.fragment_camera) {
     }
 }
 
+class RectOverlay constructor(context: Context?, attributeSet: AttributeSet?) :
+    View(context, attributeSet) {
+
+    private var rectangle =  RectF()
+    private val paint = Paint().apply {
+        style = Paint.Style.STROKE
+        color = ContextCompat.getColor(context!!, android.R.color.black)
+        strokeWidth = 10f
+    }
+    override fun onDraw(canvas: Canvas) {
+        super.onDraw(canvas)
+        // Pass it a list of RectF (rectBounds)
+        canvas.drawRect(rectangle, paint)
+    }
+
+    fun drawRectangle(rect: RectF) {
+        this.rectangle = rect
+        invalidate()
+    }
+}
 
