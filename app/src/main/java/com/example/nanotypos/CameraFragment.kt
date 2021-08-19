@@ -35,7 +35,6 @@ import java.util.concurrent.Executors
 
 class CameraFragment: Fragment(R.layout.fragment_camera) {
 
-
     private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
     private lateinit var cameraExecutor: ExecutorService
     private var lensFacing: Int = CameraSelector.LENS_FACING_BACK
@@ -85,10 +84,10 @@ class CameraFragment: Fragment(R.layout.fragment_camera) {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
         val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
         // Add a listener to the cameraProviderFuture.
-        // The first argument is a Runnable, which will be where the magic actually happens.
-        // The second argument (way down below) is an Executor that runs on the main thread.
+        // The first argument is a Runnable.
+        // The second argument is an Executor that runs on the main thread.
         cameraProviderFuture.addListener({
-            // Add a ProcessCameraProvider, which binds the lifecycle of your camera to
+            // Add a ProcessCameraProvider, which binds the lifecycle of the camera to
             // the LifecycleOwner within the application's life.
             val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
             // Initialize the Preview object, get a surface provider from your PreviewView,
@@ -105,15 +104,6 @@ class CameraFragment: Fragment(R.layout.fragment_camera) {
             val objectDetector: ObjectDetector =
                 ObjectDetector.createFromFileAndOptions(context, "model.tflite", options)
 
-            val topLeft = RectF(0F, 0F, 50F, 50F)
-            val topRight = RectF(1030F, 0F, 1080F, 50F)
-            val bottomLeft = RectF(0F, 1436F, 50F, 1486F)
-            val bottomRight = RectF(1030F, 1436F, 1080F, 1486F)
-            val rectangles: MutableList<RectF> = mutableListOf()
-            rectangles.add(topLeft)
-            rectangles.add(topRight)
-            rectangles.add(bottomLeft)
-            rectangles.add(bottomRight)
 
             // Setup the ImageAnalyzer for the ImageAnalysis use case
             val imageAnalysis =
@@ -143,21 +133,7 @@ class CameraFragment: Fragment(R.layout.fragment_camera) {
                                                 )
                                             }
                                         }
-                                        /*
-                                    rectangles.add(boundingBox)
-                                    binding.rectOverlay.post { binding.rectOverlay.drawBoxes(rectangles) }
-                                    rectangles.removeAt(4)
-
-                                     */
                                     }
-
-                                    if (boundingBox != null) {
-                                        Log.d(
-                                            "LOGO",
-                                            "Score is $score (${boundingBox.left}, ${boundingBox.top}) - (${boundingBox.right},${boundingBox.bottom}) "
-                                        )
-                                    }
-                                    //Log.d("LOGO", "Width is ${binding.viewFinder.width} and height is ${binding.viewFinder.height}")
                                 }
 
 
@@ -178,6 +154,45 @@ class CameraFragment: Fragment(R.layout.fragment_camera) {
             }
         }, ContextCompat.getMainExecutor(requireContext()))
     }
+
+    /**
+     * Helper function used to map the coordinates for objects coming out of
+     * the model into the coordinates that the user sees on the screen.
+     */
+    private fun fixCoords(box: RectF, sourceWidth: Int, sourceHeight: Int): RectF {
+        val targetWidth = binding.viewFinder.width.toFloat()
+        val targetHeight = binding.viewFinder.height.toFloat()
+        /*
+
+        //OLD IMPLEMENTATION
+
+        box.left = box.left * targetWidth / sourceWidth
+        box.right = box.right * targetWidth / sourceWidth
+        box.top = box.top * targetHeight / sourceHeight
+        box.bottom = box.bottom * targetHeight / sourceHeight
+
+
+        val tempLeft = (1- box.top / targetHeight) * targetWidth
+        val tempRight = (1- box.bottom / targetHeight) * targetWidth
+        val tempBottom = (box.left / targetWidth ) * targetHeight
+        val tempTop =  (box.right / targetWidth ) * targetHeight
+         */
+
+        //NEW IMPLEMENTATION
+
+        val tempLeft = targetWidth * (1 - box.top / sourceHeight.toFloat())
+        val tempRight = targetWidth * (1 -  box.bottom / sourceHeight.toFloat())
+        val tempBottom = (box.left  / sourceWidth.toFloat() ) * targetHeight
+        val tempTop =  (box.right / sourceWidth.toFloat() ) * targetHeight
+
+        box.left = tempLeft
+        box.right = tempRight
+        box.bottom = tempBottom
+        box.top = tempTop
+
+        return box
+    }
+
 
     private fun Image.toBitmap(): Bitmap {
         val yBuffer = planes[0].buffer // Y
@@ -227,46 +242,7 @@ class CameraFragment: Fragment(R.layout.fragment_camera) {
         super.onDestroy()
     }
 
-    /**
-     * Helper function used to map the coordinates for objects coming out of
-     * the model into the coordinates that the user sees on the screen.
-     */
-    private fun fixCoords(box: RectF, sourceWidth: Int, sourceHeight: Int): RectF {
-        val targetWidth = binding.viewFinder.width.toFloat()
-        val targetHeight = binding.viewFinder.height.toFloat()
-        /*
 
-        //OLD IMPLEMENTATION
-
-        box.left = box.left * targetWidth / sourceWidth
-        box.right = box.right * targetWidth / sourceWidth
-        box.top = box.top * targetHeight / sourceHeight
-        box.bottom = box.bottom * targetHeight / sourceHeight
-
-
-        val tempLeft = (1- box.top / targetHeight) * targetWidth
-        val tempRight = (1- box.bottom / targetHeight) * targetWidth
-        val tempBottom = (box.left / targetWidth ) * targetHeight
-        val tempTop =  (box.right / targetWidth ) * targetHeight
-         */
-
-        //NEW IMPLEMENTATION
-
-        val tempLeft = targetWidth * (1 - box.top / sourceHeight.toFloat())
-        val tempRight = targetWidth * (1 -  box.bottom / sourceHeight.toFloat())
-        val tempBottom = (box.left  / sourceWidth.toFloat() ) * targetHeight
-        val tempTop =  (box.right / sourceWidth.toFloat() ) * targetHeight
-
-        box.left = tempLeft
-        box.right = tempRight
-        box.bottom = tempBottom
-        box.top = tempTop
-
-
-
-
-        return box
-    }
 }
 
 class RectOverlay constructor(context: Context?, attributeSet: AttributeSet?) :
