@@ -55,6 +55,7 @@ class CameraFragment: Fragment(R.layout.fragment_camera) {
         super.onCreate(savedInstanceState)
         cameraExecutor = Executors.newSingleThreadExecutor()
     }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -76,6 +77,7 @@ class CameraFragment: Fragment(R.layout.fragment_camera) {
             )
         }
     }
+
     @androidx.camera.core.ExperimentalGetImage
     private fun startCamera() {
         // Create an instance of the ProcessCameraProvider,
@@ -98,46 +100,74 @@ class CameraFragment: Fragment(R.layout.fragment_camera) {
             preview.setSurfaceProvider(binding.viewFinder.surfaceProvider)
 
             val options: ObjectDetector.ObjectDetectorOptions =
-                ObjectDetector.ObjectDetectorOptions.builder().setMaxResults(1).setScoreThreshold(0.1f).build()
+                ObjectDetector.ObjectDetectorOptions.builder().setMaxResults(1).build()
 
             val objectDetector: ObjectDetector =
                 ObjectDetector.createFromFileAndOptions(context, "model.tflite", options)
 
+            val topLeft = RectF(0F, 0F, 50F, 50F)
+            val topRight = RectF(1030F, 0F, 1080F, 50F)
+            val bottomLeft = RectF(0F, 1436F, 50F, 1486F)
+            val bottomRight = RectF(1030F, 1436F, 1080F, 1486F)
+            val rectangles: MutableList<RectF> = mutableListOf()
+            rectangles.add(topLeft)
+            rectangles.add(topRight)
+            rectangles.add(bottomLeft)
+            rectangles.add(bottomRight)
+
             // Setup the ImageAnalyzer for the ImageAnalysis use case
-            val imageAnalysis = ImageAnalysis.Builder().setBackpressureStrategy(STRATEGY_KEEP_ONLY_LATEST)
-                .build()
-                .also {
-                    it.setAnalyzer(cameraExecutor, { input ->
-                        try {
-                            //image = InputImage.fromFilePath(context, uri)
+            val imageAnalysis =
+                ImageAnalysis.Builder().setBackpressureStrategy(STRATEGY_KEEP_ONLY_LATEST)
+                    .setTargetResolution(Size(binding.viewFinder.width, binding.viewFinder.height))
+                    .build()
+                    .also {
+                        it.setAnalyzer(cameraExecutor, { input ->
+                            try {
+                                val bitmap = input.image?.toBitmap()
+                                val tensorImage = TensorImage.fromBitmap(bitmap)
 
-                            val bitmap = input.image?.toBitmap()
-                            val tensorImage = TensorImage.fromBitmap(bitmap)
+                                // Run inference
+                                val results: List<Detection> = objectDetector.detect(tensorImage)
+                                if (results.isNotEmpty()) {
+                                    val detectedObject = results.first()
+                                    val obj = detectedObject.categories.first()
 
-                            // Run inference
-                            val results: List<Detection> = objectDetector.detect(tensorImage)
-                            val detectedObject = results.first()
-                            val obj = detectedObject.categories.first()
+                                    val boundingBox = bitmap?.let { it1 -> fixCoords(detectedObject.boundingBox, it1.width, it1.height) }
+                                    val score = obj.score
+                                    activity?.runOnUiThread {
+                                        binding.scoreText.setText("Score is $score")
+                                        binding.rectOverlay.post {
+                                            if (boundingBox != null) {
+                                                binding.rectOverlay.drawRectangle(
+                                                    boundingBox
+                                                )
+                                            }
+                                        }
+                                        /*
+                                    rectangles.add(boundingBox)
+                                    binding.rectOverlay.post { binding.rectOverlay.drawBoxes(rectangles) }
+                                    rectangles.removeAt(4)
 
-                            val boundingBox = detectedObject.boundingBox
-                            val score = obj.score
-                            activity?.runOnUiThread {
-                                binding.scoreText.setText("Score is $score")
-                                binding.rectOverlay.post { binding.rectOverlay.drawRectangle(boundingBox) }
+                                     */
+                                    }
+
+                                    if (boundingBox != null) {
+                                        Log.d(
+                                            "LOGO",
+                                            "Score is $score (${boundingBox.left}, ${boundingBox.top}) - (${boundingBox.right},${boundingBox.bottom}) "
+                                        )
+                                    }
+                                    //Log.d("LOGO", "Width is ${binding.viewFinder.width} and height is ${binding.viewFinder.height}")
+                                }
+
+
+                            } catch (e: IOException) {
+                                e.printStackTrace()
                             }
+                            input.close()
+                        })
+                    }
 
-                            Log.d(
-                                "LOGO",
-                                "Score is $score (${boundingBox.left}, ${boundingBox.top}) - (${boundingBox.right},${boundingBox.bottom}) "
-                            )
-
-
-                        } catch (e: IOException) {
-                            e.printStackTrace()
-                        }
-                        input.close()
-                    })
-                }
             try {
                 // Unbind any bound use cases before rebinding
                 cameraProvider.unbindAll()
@@ -163,7 +193,7 @@ class CameraFragment: Fragment(R.layout.fragment_camera) {
 
         val yuvImage = YuvImage(nv21, ImageFormat.NV21, this.width, this.height, null)
         val out = ByteArrayOutputStream()
-        yuvImage.compressToJpeg(Rect(0, 0, yuvImage.width, yuvImage.height), 50, out)
+        yuvImage.compressToJpeg(Rect(0, 0, yuvImage.width, yuvImage.height), 100, out)
         val imageBytes = out.toByteArray()
         return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
     }
@@ -192,61 +222,50 @@ class CameraFragment: Fragment(R.layout.fragment_camera) {
         }
     }
 
-
     override fun onDestroy() {
         cameraExecutor.shutdown()
         super.onDestroy()
     }
 
-
-
-
     /**
      * Helper function used to map the coordinates for objects coming out of
      * the model into the coordinates that the user sees on the screen.
      */
-    private fun mapOutputCoordinates(location: RectF): RectF {
+    private fun fixCoords(box: RectF, sourceWidth: Int, sourceHeight: Int): RectF {
+        val targetWidth = binding.viewFinder.width.toFloat()
+        val targetHeight = binding.viewFinder.height.toFloat()
+        /*
 
-        // Step 1: map location to the preview coordinates
-        val previewLocation = RectF(
-            location.left * binding.viewFinder.width,
-            location.top * binding.viewFinder.height,
-            location.right * binding.viewFinder.width,
-            location.bottom * binding.viewFinder.height
-        )
+        //OLD IMPLEMENTATION
 
-        // Step 2: compensate for camera sensor orientation and mirroring
-        val isFrontFacing = lensFacing == CameraSelector.LENS_FACING_FRONT
-        val correctedLocation = if (isFrontFacing) {
-            RectF(
-                binding.viewFinder.width - previewLocation.right,
-                previewLocation.top,
-                binding.viewFinder.width - previewLocation.left,
-                previewLocation.bottom)
-        } else {
-            previewLocation
-        }
+        box.left = box.left * targetWidth / sourceWidth
+        box.right = box.right * targetWidth / sourceWidth
+        box.top = box.top * targetHeight / sourceHeight
+        box.bottom = box.bottom * targetHeight / sourceHeight
 
-        // Step 3: compensate for 1:1 to 4:3 aspect ratio conversion + small margin
-        val margin = 0.1f
-        val requestedRatio = 4f / 3f
-        val midX = (correctedLocation.left + correctedLocation.right) / 2f
-        val midY = (correctedLocation.top + correctedLocation.bottom) / 2f
-        return if (binding.viewFinder.width < binding.viewFinder.height) {
-            RectF(
-                midX - (1f + margin) * requestedRatio * correctedLocation.width() / 2f,
-                midY - (1f - margin) * correctedLocation.height() / 2f,
-                midX + (1f + margin) * requestedRatio * correctedLocation.width() / 2f,
-                midY + (1f - margin) * correctedLocation.height() / 2f
-            )
-        } else {
-            RectF(
-                midX - (1f - margin) * correctedLocation.width() / 2f,
-                midY - (1f + margin) * requestedRatio * correctedLocation.height() / 2f,
-                midX + (1f - margin) * correctedLocation.width() / 2f,
-                midY + (1f + margin) * requestedRatio * correctedLocation.height() / 2f
-            )
-        }
+
+        val tempLeft = (1- box.top / targetHeight) * targetWidth
+        val tempRight = (1- box.bottom / targetHeight) * targetWidth
+        val tempBottom = (box.left / targetWidth ) * targetHeight
+        val tempTop =  (box.right / targetWidth ) * targetHeight
+         */
+
+        //NEW IMPLEMENTATION
+
+        val tempLeft = targetWidth * (1 - box.top / sourceHeight.toFloat())
+        val tempRight = targetWidth * (1 -  box.bottom / sourceHeight.toFloat())
+        val tempBottom = (box.left  / sourceWidth.toFloat() ) * targetHeight
+        val tempTop =  (box.right / sourceWidth.toFloat() ) * targetHeight
+
+        box.left = tempLeft
+        box.right = tempRight
+        box.bottom = tempBottom
+        box.top = tempTop
+
+
+
+
+        return box
     }
 }
 
@@ -254,19 +273,27 @@ class RectOverlay constructor(context: Context?, attributeSet: AttributeSet?) :
     View(context, attributeSet) {
 
     private var rectangle =  RectF()
+    private val rectangles: MutableList<RectF> = mutableListOf()
     private val paint = Paint().apply {
         style = Paint.Style.STROKE
-        color = ContextCompat.getColor(context!!, android.R.color.black)
+        color = ContextCompat.getColor(context!!, android.R.color.white)
         strokeWidth = 10f
     }
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         // Pass it a list of RectF (rectBounds)
         canvas.drawRect(rectangle, paint)
+        rectangles.forEach { canvas.drawRect(it, paint) }
     }
 
     fun drawRectangle(rect: RectF) {
         this.rectangle = rect
+        invalidate()
+    }
+
+    fun drawBoxes(boxes: List<RectF>){
+        this.rectangles.clear()
+        this.rectangles.addAll(boxes)
         invalidate()
     }
 }
