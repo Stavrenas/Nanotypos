@@ -35,7 +35,7 @@ class ImageFragment: Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         val fragmentBinding = FragmentImageBinding.inflate(inflater, container, false)
         binding = fragmentBinding
         return fragmentBinding.root
@@ -66,9 +66,9 @@ class ImageFragment: Fragment() {
         val objectDetector: ObjectDetector =
             ObjectDetector.createFromFileAndOptions(context, "model.tflite", options)
         try {
-            //image = InputImage.fromFilePath(context, uri)
             val bitmap = MediaStore.Images.Media.getBitmap(activity?.contentResolver, uri)
             val tensorImage = TensorImage.fromBitmap(bitmap)
+
             // Run inference
             val results: List<Detection> = objectDetector.detect(tensorImage)
             for (detectedObject in results) {
@@ -164,11 +164,11 @@ class ImageFragment: Fragment() {
         pen.style = Paint.Style.FILL_AND_STROKE
         pen.color = Color.YELLOW
         pen.strokeWidth = 2F
-
         pen.textSize = MAX_FONT_SIZE
+
         for (category in detectionResult.categories) {
             val label = category.label
-            val score = category.score
+            //val score = category.score
             pen.getTextBounds(label, 0, label.length, tagSize)
 
             val fontSize: Float = pen.textSize * box.width() / tagSize.width()
