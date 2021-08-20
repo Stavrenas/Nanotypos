@@ -99,7 +99,7 @@ class CameraFragment: Fragment(R.layout.fragment_camera) {
             preview.setSurfaceProvider(binding.viewFinder.surfaceProvider)
 
             val options: ObjectDetector.ObjectDetectorOptions =
-                ObjectDetector.ObjectDetectorOptions.builder().setMaxResults(1).build()
+                ObjectDetector.ObjectDetectorOptions.builder().setMaxResults(1).setScoreThreshold(0.75F).build()
 
             val objectDetector: ObjectDetector =
                 ObjectDetector.createFromFileAndOptions(context, "model.tflite", options)
@@ -134,6 +134,16 @@ class CameraFragment: Fragment(R.layout.fragment_camera) {
                                             }
                                         }
                                     }
+                                }
+                                else{
+                                    activity?.runOnUiThread {
+                                        binding.scoreText.setText("Logo not found")
+                                        binding.rectOverlay.post {
+                                                binding.rectOverlay.drawRectangle(RectF(0f,0f,0f,0f))
+
+                                        }
+                                    }
+
                                 }
 
 
@@ -182,8 +192,8 @@ class CameraFragment: Fragment(R.layout.fragment_camera) {
 
         val tempLeft = targetWidth * (1 - box.top / sourceHeight.toFloat())
         val tempRight = targetWidth * (1 -  box.bottom / sourceHeight.toFloat())
-        val tempBottom = (box.left  / sourceWidth.toFloat() ) * targetHeight
-        val tempTop =  (box.right / sourceWidth.toFloat() ) * targetHeight
+        val tempBottom = (box.left  / sourceWidth.toFloat() ) * targetHeight * 1.02F
+        val tempTop =  (box.right / sourceWidth.toFloat() ) * targetHeight * 0.98F
 
         box.left = tempLeft
         box.right = tempRight
@@ -252,14 +262,14 @@ class RectOverlay constructor(context: Context?, attributeSet: AttributeSet?) :
     private val rectangles: MutableList<RectF> = mutableListOf()
     private val paint = Paint().apply {
         style = Paint.Style.STROKE
-        color = ContextCompat.getColor(context!!, android.R.color.white)
+        color = Color.RED
         strokeWidth = 10f
     }
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         // Pass it a list of RectF (rectBounds)
         canvas.drawRect(rectangle, paint)
-        rectangles.forEach { canvas.drawRect(it, paint) }
+        //rectangles.forEach { canvas.drawRect(it, paint) }
     }
 
     fun drawRectangle(rect: RectF) {
