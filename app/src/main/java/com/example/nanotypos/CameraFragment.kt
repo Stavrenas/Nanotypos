@@ -249,53 +249,47 @@ class RectOverlay constructor(context: Context?, attributeSet: AttributeSet?) :
 
     private var rectangle =  RectF()
     private val rectangles: MutableList<RectF> = mutableListOf()
+    private val tagSize = Rect(0, 0, 0, 0)
+
     private val paint = Paint().apply {
         style = Paint.Style.STROKE
         color = Color.RED
-        strokeWidth = 10f
+        strokeWidth = 4f
     }
     private val label = "Nanotypos is\nthe best company\nthat has ever existed."
     private val pen = Paint().apply {
         textAlign = Paint.Align.LEFT
+        color = resources.getColor(R.color.teal)
+        typeface = Typeface.create("HELVETICA", Typeface.BOLD)
+        setShadowLayer(0F, 0F, 0F, Color.DKGRAY)
+    }
 
+    private val nicePen = Paint(pen).apply {
+        color = Color.BLACK
         style = Paint.Style.STROKE
-
-        // calculate the right font size
-        style = Paint.Style.FILL_AND_STROKE
-        color = Color.YELLOW
-        strokeWidth = 0.1f
-
+        strokeWidth = 8F
     }
 
-    private val mPaint = Paint().apply{
-        color = resources.getColor(R.color.transparentBlack)
-    }
-
-    private val tagSize = Rect(0, 0, 0, 0)
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        canvas.drawRect(rectangle, paint)
+        //canvas.drawRect(rectangle, paint)
         //rectangles.forEach { canvas.drawRect(it, paint) }
-        //val label: String = resources.getString(R.string.motto)
+
         pen.getTextBounds(label, 0, label.length, tagSize)
-        pen.textSize =  10f
+        pen.textSize = rectangle.width().times(-0.2F)
+        nicePen.getTextBounds(label, 0, label.length, tagSize)
+        nicePen.textSize = rectangle.width().times(-0.205F)
 
         //rectangle points are inverted!?
-        val x= rectangle.left
         var y= rectangle.bottom - rectangle.height()/2
 
         for (line in label.split("\n")) {
-            canvas.drawText(line, x, y, pen)
+            canvas.drawText(line, rectangle.left, y, nicePen)
+            canvas.drawText(line, rectangle.left, y, pen)
             y += pen.descent() - pen.ascent()
         }
-
-        canvas.drawRect(x, rectangle.bottom - rectangle.height()/2 + pen.ascent() , x+label.length.toFloat() * pen.textSize, y + pen.ascent(), mPaint)
-
-
-
-
     }
 
 

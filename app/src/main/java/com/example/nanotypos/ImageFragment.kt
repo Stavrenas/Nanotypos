@@ -35,11 +35,6 @@ class ImageFragment: Fragment() {
     private val pen = Paint().apply {
         textAlign = Paint.Align.LEFT
 
-        // draw bounding box
-        color = Color.RED
-        strokeWidth = 8F
-        style = Paint.Style.STROKE
-
         // calculate the right font size
         style = Paint.Style.FILL_AND_STROKE
         color = Color.YELLOW
