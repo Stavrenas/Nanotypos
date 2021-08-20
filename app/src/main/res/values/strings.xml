@@ -13,4 +13,5 @@
     <string name="Preview">Live Camera Preview</string>
     <string name="QR_success">The QR code you scanned leads you to:</string>
     <string name="QR_failure">The QR code you scanned does not lead somewhere.</string>
+    <string name="NoLogo">Nanotypos Logo not found.</string>
 </resources>

@@ -32,6 +32,21 @@ class ImageFragment: Fragment() {
         private const val MAX_FONT_SIZE = 96F
     }
 
+    private val pen = Paint().apply {
+        textAlign = Paint.Align.LEFT
+
+        // draw bounding box
+        color = Color.RED
+        strokeWidth = 8F
+        style = Paint.Style.STROKE
+
+        // calculate the right font size
+        style = Paint.Style.FILL_AND_STROKE
+        color = Color.YELLOW
+        strokeWidth = 2F
+        textSize = MAX_FONT_SIZE
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -77,7 +92,7 @@ class ImageFragment: Fragment() {
 
                     val imgWithResult = drawDetectionResult(bitmap, detectedObject)
                     binding?.targetImage?.setImageBitmap(imgWithResult)
-                    //sharedViewModel.setModelUri(imgWithResult)
+
                 }
 
             }
@@ -125,7 +140,6 @@ class ImageFragment: Fragment() {
                     }
                 }
                 // Task completed successfully
-                // ...
 
                 //Display toast if QR is not found
                 if (!foundCode)
@@ -133,7 +147,6 @@ class ImageFragment: Fragment() {
             }
                 .addOnFailureListener {
                     // Task failed with an exception
-                    // ...
                     Toast.makeText(activity, "Error :(", Toast.LENGTH_SHORT).show()
                 }
 
@@ -148,23 +161,11 @@ class ImageFragment: Fragment() {
     ): Bitmap {
         val outputBitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
         val canvas = Canvas(outputBitmap)
-        val pen = Paint()
-        pen.textAlign = Paint.Align.LEFT
 
-        // draw bounding box
-        pen.color = Color.RED
-        pen.strokeWidth = 8F
-        pen.style = Paint.Style.STROKE
         val box = detectionResult.boundingBox
         canvas.drawRect(box, pen)
 
         val tagSize = Rect(0, 0, 0, 0)
-
-        // calculate the right font size
-        pen.style = Paint.Style.FILL_AND_STROKE
-        pen.color = Color.YELLOW
-        pen.strokeWidth = 2F
-        pen.textSize = MAX_FONT_SIZE
 
         for (category in detectionResult.categories) {
             val label = category.label
@@ -186,8 +187,6 @@ class ImageFragment: Fragment() {
 
         return outputBitmap
     }
-
-
 
 
 }

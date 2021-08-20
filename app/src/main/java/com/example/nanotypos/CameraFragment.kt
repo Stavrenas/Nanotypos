@@ -33,6 +33,11 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 
+
+
+
+
+
 class CameraFragment: Fragment(R.layout.fragment_camera) {
 
     private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
@@ -68,7 +73,9 @@ class CameraFragment: Fragment(R.layout.fragment_camera) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (allPermissionsGranted()) {
+            Toast.makeText(activity, "Make sure the logo is on the center", Toast.LENGTH_LONG).show()
             startCamera()
+
         } else {
             requestPermissions(
                 REQUIRED_PERMISSIONS,
@@ -78,7 +85,7 @@ class CameraFragment: Fragment(R.layout.fragment_camera) {
     }
 
     @androidx.camera.core.ExperimentalGetImage
-    private fun startCamera() {
+    fun startCamera() {
         // Create an instance of the ProcessCameraProvider,
         // which will be used to bind the use cases to a lifecycle owner.
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
@@ -86,6 +93,7 @@ class CameraFragment: Fragment(R.layout.fragment_camera) {
         // Add a listener to the cameraProviderFuture.
         // The first argument is a Runnable.
         // The second argument is an Executor that runs on the main thread.
+
         cameraProviderFuture.addListener({
             // Add a ProcessCameraProvider, which binds the lifecycle of the camera to
             // the LifecycleOwner within the application's life.
@@ -137,15 +145,13 @@ class CameraFragment: Fragment(R.layout.fragment_camera) {
                                 }
                                 else{
                                     activity?.runOnUiThread {
-                                        binding.scoreText.setText("Logo not found")
+                                        binding.scoreText.setText(R.string.NoLogo)
                                         binding.rectOverlay.post {
-                                                binding.rectOverlay.drawRectangle(RectF(0f,0f,0f,0f))
-
+                                                binding.rectOverlay.drawRectangle(RectF(-1f,-1f,-1f,-1f))
                                         }
                                     }
 
                                 }
-
 
                             } catch (e: IOException) {
                                 e.printStackTrace()
@@ -172,23 +178,6 @@ class CameraFragment: Fragment(R.layout.fragment_camera) {
     private fun fixCoords(box: RectF, sourceWidth: Int, sourceHeight: Int): RectF {
         val targetWidth = binding.viewFinder.width.toFloat()
         val targetHeight = binding.viewFinder.height.toFloat()
-        /*
-
-        //OLD IMPLEMENTATION
-
-        box.left = box.left * targetWidth / sourceWidth
-        box.right = box.right * targetWidth / sourceWidth
-        box.top = box.top * targetHeight / sourceHeight
-        box.bottom = box.bottom * targetHeight / sourceHeight
-
-
-        val tempLeft = (1- box.top / targetHeight) * targetWidth
-        val tempRight = (1- box.bottom / targetHeight) * targetWidth
-        val tempBottom = (box.left / targetWidth ) * targetHeight
-        val tempTop =  (box.right / targetWidth ) * targetHeight
-         */
-
-        //NEW IMPLEMENTATION
 
         val tempLeft = targetWidth * (1 - box.top / sourceHeight.toFloat())
         val tempRight = targetWidth * (1 -  box.bottom / sourceHeight.toFloat())
@@ -265,12 +254,50 @@ class RectOverlay constructor(context: Context?, attributeSet: AttributeSet?) :
         color = Color.RED
         strokeWidth = 10f
     }
+    private val label = "Nanotypos is\nthe best company\nthat has ever existed."
+    private val pen = Paint().apply {
+        textAlign = Paint.Align.LEFT
+
+        style = Paint.Style.STROKE
+
+        // calculate the right font size
+        style = Paint.Style.FILL_AND_STROKE
+        color = Color.YELLOW
+        strokeWidth = 0.1f
+
+    }
+
+    private val mPaint = Paint().apply{
+        color = resources.getColor(R.color.transparentBlack)
+    }
+
+    private val tagSize = Rect(0, 0, 0, 0)
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        // Pass it a list of RectF (rectBounds)
+
         canvas.drawRect(rectangle, paint)
         //rectangles.forEach { canvas.drawRect(it, paint) }
+        //val label: String = resources.getString(R.string.motto)
+        pen.getTextBounds(label, 0, label.length, tagSize)
+        pen.textSize =  10f
+
+        //rectangle points are inverted!?
+        val x= rectangle.left
+        var y= rectangle.bottom - rectangle.height()/2
+
+        for (line in label.split("\n")) {
+            canvas.drawText(line, x, y, pen)
+            y += pen.descent() - pen.ascent()
+        }
+
+        canvas.drawRect(x, rectangle.bottom - rectangle.height()/2 + pen.ascent() , x+label.length.toFloat() * pen.textSize, y + pen.ascent(), mPaint)
+
+
+
+
     }
+
 
     fun drawRectangle(rect: RectF) {
         this.rectangle = rect
@@ -282,5 +309,6 @@ class RectOverlay constructor(context: Context?, attributeSet: AttributeSet?) :
         this.rectangles.addAll(boxes)
         invalidate()
     }
+
 }
 
