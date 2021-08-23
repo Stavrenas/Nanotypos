@@ -107,7 +107,8 @@ class CameraFragment: Fragment(R.layout.fragment_camera) {
             preview.setSurfaceProvider(binding.viewFinder.surfaceProvider)
 
             val options: ObjectDetector.ObjectDetectorOptions =
-                ObjectDetector.ObjectDetectorOptions.builder().setMaxResults(1).setScoreThreshold(0.75F).build()
+                ObjectDetector.ObjectDetectorOptions.builder().setMaxResults(1).setNumThreads(2).setScoreThreshold(0.75F).build()
+
 
             val objectDetector: ObjectDetector =
                 ObjectDetector.createFromFileAndOptions(context, "model.tflite", options)
