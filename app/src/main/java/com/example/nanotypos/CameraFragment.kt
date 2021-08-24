@@ -20,10 +20,7 @@ import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
-import com.example.nanotypos.data.ViewModel
 import com.example.nanotypos.databinding.FragmentCameraBinding
-import com.google.common.util.concurrent.ListenableFuture
 import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.task.vision.detector.Detection
 import org.tensorflow.lite.task.vision.detector.ObjectDetector
@@ -40,10 +37,10 @@ import java.util.concurrent.Executors
 
 class CameraFragment: Fragment(R.layout.fragment_camera) {
 
-    private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
+    //private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
     private lateinit var cameraExecutor: ExecutorService
-    private var lensFacing: Int = CameraSelector.LENS_FACING_BACK
-    private val sharedViewModel: ViewModel by activityViewModels()
+    //private var lensFacing: Int = CameraSelector.LENS_FACING_BACK
+    //private val sharedViewModel: ViewModel by activityViewModels()
 
     private var _binding: FragmentCameraBinding? = null
     private val binding get() = _binding!!
@@ -252,11 +249,14 @@ class RectOverlay constructor(context: Context?, attributeSet: AttributeSet?) :
     private val rectangles: MutableList<RectF> = mutableListOf()
     private val tagSize = Rect(0, 0, 0, 0)
 
+    /*
     private val paint = Paint().apply {
         style = Paint.Style.STROKE
         color = Color.RED
         strokeWidth = 4f
     }
+    */
+
     private val label = "Nanotypos is\nthe best company\nthat has ever existed."
     private val pen = Paint().apply {
         textAlign = Paint.Align.LEFT

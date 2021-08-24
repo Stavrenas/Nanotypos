@@ -34,11 +34,10 @@ class ImageFragment: Fragment() {
 
     private val pen = Paint().apply {
         textAlign = Paint.Align.LEFT
-
         // calculate the right font size
-        style = Paint.Style.FILL_AND_STROKE
-        color = Color.YELLOW
-        strokeWidth = 2F
+        style = Paint.Style.STROKE
+        color = Color.RED
+        strokeWidth = 4F
         textSize = MAX_FONT_SIZE
     }
 
@@ -174,10 +173,14 @@ class ImageFragment: Fragment() {
 
             var margin = (box.width() - tagSize.width()) / 2.0F
             if (margin < 0F) margin = 0F
+            pen.style = Paint.Style.FILL_AND_STROKE
+            pen.color = Color.YELLOW
             canvas.drawText(
                 label, box.left + margin,
                 box.top + tagSize.height().times(1F), pen
             )
+            pen.style = Paint.Style.STROKE
+            pen.color = Color.RED
         }
 
         return outputBitmap
