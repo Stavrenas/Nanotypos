@@ -8,11 +8,17 @@ import com.google.android.youtube.player.YouTubePlayer
 import com.google.android.youtube.player.YouTubePlayerView
 
 
+
+
+
 class PlayYoutubeActivity(player: YouTubePlayerView) : YouTubeBaseActivity() {
 
     val youTubePlayerView = player
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
+
+
 
         youTubePlayerView.initialize(
             api_key,
@@ -42,7 +48,9 @@ class PlayYoutubeActivity(player: YouTubePlayerView) : YouTubeBaseActivity() {
 
 
     companion object {
-        const val videoID = "kh4QM-6mZYc"
+        const val videoID = "O2dKo_wC1Dg"
         const val api_key = "AIzaSyCZZZ93hntMuPk-RX1DKwrNvgYAAi1lZIE"
     }
 }
+
+

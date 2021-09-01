@@ -43,8 +43,6 @@ class CameraFragment : Fragment(R.layout.fragment_camera)  {
     private var _binding: FragmentCameraBinding? = null
     private val binding get() = _binding!!
     private var totalDetected = 0
-    val videoID = "kh4QM-6mZYc"
-    val api_key = "AIzaSyCZZZ93hntMuPk-RX1DKwrNvgYAAi1lZIE"
 
 
     companion object {
@@ -148,7 +146,8 @@ class CameraFragment : Fragment(R.layout.fragment_camera)  {
                                             }
                                         }
                                         if(totalDetected > 20){
-                                           // PlayYoutubeActivity(binding.player)
+
+                                            //PlayYoutubeActivity(binding.player)
                                             totalDetected = 0
 
 
