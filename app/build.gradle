@@ -14,7 +14,7 @@ android {
         minSdkVersion 24
         targetSdkVersion 30
         versionCode 1
-        versionName "1.0"
+        versionName "1.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -72,7 +72,7 @@ dependencies {
     // CameraX Lifecycle Library
     implementation "androidx.camera:camera-lifecycle:$camerax_version"
     // CameraX View class
-    implementation "androidx.camera:camera-view:1.0.0-alpha27"
+    implementation "androidx.camera:camera-view:1.0.0-alpha28"
     implementation 'com.google.mlkit:object-detection-custom:16.3.3'
 
 
@@ -84,6 +84,10 @@ dependencies {
     implementation 'org.tensorflow:tensorflow-lite-task-vision:0.2.0'
     implementation 'org.tensorflow:tensorflow-lite-task-text:0.1.0'
     implementation 'org.tensorflow:tensorflow-lite-gpu:2.3.0'
+
+
+    //youtube player
+    implementation(files("libs/YouTubeAndroidPlayerApi.jar"))
 
 
 }

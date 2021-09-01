@@ -1,6 +1,8 @@
 package com.example.nanotypos
 
 import android.Manifest
+import android.app.AlertDialog
+import android.app.Dialog
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.*
@@ -19,6 +21,7 @@ import androidx.camera.core.ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import com.example.nanotypos.databinding.FragmentCameraBinding
 import org.tensorflow.lite.support.image.TensorImage
@@ -30,12 +33,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 
-
-
-
-
-
-class CameraFragment: Fragment(R.layout.fragment_camera) {
+class CameraFragment : Fragment(R.layout.fragment_camera)  {
 
     //private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
     private lateinit var cameraExecutor: ExecutorService
@@ -44,6 +42,9 @@ class CameraFragment: Fragment(R.layout.fragment_camera) {
 
     private var _binding: FragmentCameraBinding? = null
     private val binding get() = _binding!!
+    private var totalDetected = 0
+    val videoID = "kh4QM-6mZYc"
+    val api_key = "AIzaSyCZZZ93hntMuPk-RX1DKwrNvgYAAi1lZIE"
 
 
     companion object {
@@ -70,7 +71,10 @@ class CameraFragment: Fragment(R.layout.fragment_camera) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (allPermissionsGranted()) {
-            Toast.makeText(activity, "Make sure the logo is on the center", Toast.LENGTH_LONG).show()
+            //Toast.makeText(activity, "Make sure the logo is on the center", Toast.LENGTH_LONG).show()
+            Dialog().show(
+                childFragmentManager, "")
+
             startCamera()
 
         } else {
@@ -91,9 +95,12 @@ class CameraFragment: Fragment(R.layout.fragment_camera) {
         // The first argument is a Runnable.
         // The second argument is an Executor that runs on the main thread.
 
+
+        // AIzaSyCZZZ93hntMuPk-RX1DKwrNvgYAAi1lZIE
         cameraProviderFuture.addListener({
             // Add a ProcessCameraProvider, which binds the lifecycle of the camera to
             // the LifecycleOwner within the application's life.
+            var start = System.nanoTime()
             val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
             // Initialize the Preview object, get a surface provider from your PreviewView,
             // and set it on the preview instance.
@@ -104,12 +111,13 @@ class CameraFragment: Fragment(R.layout.fragment_camera) {
             preview.setSurfaceProvider(binding.viewFinder.surfaceProvider)
 
             val options: ObjectDetector.ObjectDetectorOptions =
-                ObjectDetector.ObjectDetectorOptions.builder().setMaxResults(1).setNumThreads(2).setScoreThreshold(0.75F).build()
+                ObjectDetector.ObjectDetectorOptions.builder().setMaxResults(1).setNumThreads(3).setScoreThreshold(0.75F).build()
 
 
             val objectDetector: ObjectDetector =
                 ObjectDetector.createFromFileAndOptions(context, "model.tflite", options)
 
+            Log.d("LOGO", "CREATE AGAIN EVERYTHING! ${(System.nanoTime() - start)/1000000 } ms")
 
             // Setup the ImageAnalyzer for the ImageAnalysis use case
             val imageAnalysis =
@@ -119,33 +127,51 @@ class CameraFragment: Fragment(R.layout.fragment_camera) {
                     .also {
                         it.setAnalyzer(cameraExecutor, { input ->
                             try {
+                                start = System.nanoTime()
                                 val bitmap = input.image?.toBitmap()
-                                val tensorImage = TensorImage.fromBitmap(bitmap)
 
                                 // Run inference
-                                val results: List<Detection> = objectDetector.detect(tensorImage)
+                                val results: List<Detection> = objectDetector.detect(TensorImage.fromBitmap(bitmap))
+                                Log.d("LOGO", "draw time: ${(System.nanoTime() - start)/1000000 } ms, detected $totalDetected")
                                 if (results.isNotEmpty()) {
-                                    val detectedObject = results.first()
-                                    val obj = detectedObject.categories.first()
 
-                                    val boundingBox = bitmap?.let { it1 -> fixCoords(detectedObject.boundingBox, it1.width, it1.height) }
-                                    val score = obj.score
+                                    val boundingBox = bitmap?.let { it1 -> fixCoords(results.first().boundingBox, it1.width, it1.height) }
+                                    val score = results.first().categories.first().score
+
+
                                     activity?.runOnUiThread {
+                                        totalDetected++
                                         binding.scoreText.setText("Score is $score")
                                         binding.rectOverlay.post {
                                             if (boundingBox != null) {
-                                                binding.rectOverlay.drawRectangle(
-                                                    boundingBox
-                                                )
+                                                binding.rectOverlay.drawRectangle(boundingBox)
                                             }
                                         }
+                                        if(totalDetected > 20){
+                                           // PlayYoutubeActivity(binding.player)
+                                            totalDetected = 0
+
+
+                                        }
+
                                     }
+
                                 }
                                 else{
-                                    activity?.runOnUiThread {
-                                        binding.scoreText.setText(R.string.NoLogo)
-                                        binding.rectOverlay.post {
-                                                binding.rectOverlay.drawRectangle(RectF(-1f,-1f,-1f,-1f))
+                                    totalDetected = 0
+                                    if( binding.scoreText.text != getText(R.string.NoLogo) ) {
+                                        activity?.runOnUiThread {
+                                            binding.scoreText.setText(R.string.NoLogo)
+                                            binding.rectOverlay.post {
+                                                binding.rectOverlay.drawRectangle(
+                                                    RectF(
+                                                        -1f,
+                                                        -1f,
+                                                        -1f,
+                                                        -1f
+                                                    )
+                                                )
+                                            }
                                         }
                                     }
 
@@ -304,6 +330,18 @@ class RectOverlay constructor(context: Context?, attributeSet: AttributeSet?) :
         this.rectangles.addAll(boxes)
         invalidate()
     }
-
 }
+
+class Dialog : DialogFragment() {
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog =
+        AlertDialog.Builder(requireContext())
+            .setMessage("Make sure the logo is on the center")
+            .setPositiveButton("OK") { _,_ -> }
+            .create()
+
+    companion object {
+        const val TAG = "Dialog"
+    }
+}
+
 
