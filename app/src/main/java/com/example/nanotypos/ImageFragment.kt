@@ -32,15 +32,6 @@ class ImageFragment: Fragment() {
         private const val MAX_FONT_SIZE = 96F
     }
 
-    private val pen = Paint().apply {
-        textAlign = Paint.Align.LEFT
-        // calculate the right font size
-        style = Paint.Style.STROKE
-        color = Color.RED
-        strokeWidth = 4F
-        textSize = MAX_FONT_SIZE
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -63,6 +54,15 @@ class ImageFragment: Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
+    }
+
+    private val pen = Paint().apply {
+        textAlign = Paint.Align.LEFT
+        // calculate the right font size
+        style = Paint.Style.STROKE
+        color = Color.RED
+        strokeWidth = 4F
+        textSize = MAX_FONT_SIZE
     }
 
     fun searchForLogo() {

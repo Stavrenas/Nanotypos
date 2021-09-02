@@ -1,25 +1,34 @@
 package com.example.nanotypos
-
 import android.os.Bundle
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
-import com.google.android.youtube.player.YouTubeBaseActivity
+import com.example.nanotypos.databinding.FragmentPlayerBinding
 import com.google.android.youtube.player.YouTubeInitializationResult
 import com.google.android.youtube.player.YouTubePlayer
-import com.google.android.youtube.player.YouTubePlayerView
+import com.google.android.youtube.player.YouTubePlayerFragment
 
 
+class PlayerFragment: YouTubePlayerFragment()  {
 
+    private var _binding: FragmentPlayerBinding? = null
+    private val binding get() = _binding!!
 
-
-class PlayYoutubeActivity(player: YouTubePlayerView) : YouTubeBaseActivity() {
-
-    val youTubePlayerView = player
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        _binding = FragmentPlayerBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
-
-
+        val youTubePlayerView = binding.player
         youTubePlayerView.initialize(
             api_key,
             object : YouTubePlayer.OnInitializedListener {
@@ -28,18 +37,17 @@ class PlayYoutubeActivity(player: YouTubePlayerView) : YouTubeBaseActivity() {
                     youTubePlayer: YouTubePlayer, b: Boolean
                 ) {
 
-                    // do any work here to cue video, play video, etc.
                     youTubePlayer.loadVideo(videoID)
                     youTubePlayer.play()
-                    // or to play immediately
-                    // youTubePlayer.loadVideo("5xVh-7ywKpE");
+                    Log.d("LOGO", "PLAYYAYAYAYAY")
+
                 }
 
                 override fun onInitializationFailure(
                     provider: YouTubePlayer.Provider,
                     youTubeInitializationResult: YouTubeInitializationResult
                 ) {
-                    Toast.makeText(this@PlayYoutubeActivity, "Youtube Failed!", Toast.LENGTH_SHORT)
+                    Toast.makeText(context, "Youtube Failed!", Toast.LENGTH_SHORT)
                         .show()
                 }
             })

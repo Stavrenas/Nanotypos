@@ -33,7 +33,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 
-class CameraFragment : Fragment(R.layout.fragment_camera)  {
+class CameraFragment: Fragment(R.layout.fragment_camera)  {
 
     //private lateinit var cameraProviderFuture: ListenableFuture<ProcessCameraProvider>
     private lateinit var cameraExecutor: ExecutorService
@@ -53,6 +53,17 @@ class CameraFragment : Fragment(R.layout.fragment_camera)  {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        /*
+        val fragment =
+            activity?.supportFragmentManager?.findFragmentById(R.id.playerFragment)
+        parentFragmentManager.commit {
+            setReorderingAllowed(true)
+            if (fragment != null) {
+                add(R.id.youtubePlayerFragment, fragment)
+            }
+        }
+
+         */
         cameraExecutor = Executors.newSingleThreadExecutor()
     }
 
@@ -146,11 +157,9 @@ class CameraFragment : Fragment(R.layout.fragment_camera)  {
                                             }
                                         }
                                         if(totalDetected > 20){
+                                            binding.frameLayout2.visibility = View.VISIBLE
 
-                                            //PlayYoutubeActivity(binding.player)
                                             totalDetected = 0
-
-
                                         }
 
                                     }
@@ -158,6 +167,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera)  {
                                 }
                                 else{
                                     totalDetected = 0
+                                    binding.frameLayout2.visibility = View.INVISIBLE
                                     if( binding.scoreText.text != getText(R.string.NoLogo) ) {
                                         activity?.runOnUiThread {
                                             binding.scoreText.setText(R.string.NoLogo)
