@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.*
 import android.media.Image
@@ -73,6 +74,14 @@ class CameraFragment: Fragment(R.layout.fragment_camera)  {
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentCameraBinding.inflate(inflater, container, false)
+        val videoFragment = PlayerFragment()
+        /*
+        childFragmentManager.beginTransaction().apply {
+            add(R.id.youtubePlayerFragment, videoFragment)
+            commit()
+        }
+
+         */
         return binding.root
     }
 
@@ -126,7 +135,6 @@ class CameraFragment: Fragment(R.layout.fragment_camera)  {
             val objectDetector: ObjectDetector =
                 ObjectDetector.createFromFileAndOptions(context, "model.tflite", options)
 
-            Log.d("LOGO", "CREATE AGAIN EVERYTHING! ${(System.nanoTime() - start)/1000000 } ms")
 
             // Setup the ImageAnalyzer for the ImageAnalysis use case
             val imageAnalysis =
@@ -141,7 +149,7 @@ class CameraFragment: Fragment(R.layout.fragment_camera)  {
 
                                 // Run inference
                                 val results: List<Detection> = objectDetector.detect(TensorImage.fromBitmap(bitmap))
-                                Log.d("LOGO", "draw time: ${(System.nanoTime() - start)/1000000 } ms, detected $totalDetected")
+                                //Log.d("LOGO", "draw time: ${(System.nanoTime() - start)/1000000 } ms, detected $totalDetected")
                                 if (results.isNotEmpty()) {
 
                                     val boundingBox = bitmap?.let { it1 -> fixCoords(results.first().boundingBox, it1.width, it1.height) }
@@ -157,9 +165,11 @@ class CameraFragment: Fragment(R.layout.fragment_camera)  {
                                             }
                                         }
                                         if(totalDetected > 20){
-                                            binding.frameLayout2.visibility = View.VISIBLE
-
+                                            //binding.frameLayout2.visibility = View.VISIBLE
+                                            //findNavController().navigate(R.id.action_cameraFragment_to_playerFragment)
+                                                val intent = Intent(context, YoutubeActivity::class.java)
                                             totalDetected = 0
+                                            startActivity(intent)
                                         }
 
                                     }
@@ -167,7 +177,7 @@ class CameraFragment: Fragment(R.layout.fragment_camera)  {
                                 }
                                 else{
                                     totalDetected = 0
-                                    binding.frameLayout2.visibility = View.INVISIBLE
+                                    //binding.frameLayout2.visibility = View.INVISIBLE
                                     if( binding.scoreText.text != getText(R.string.NoLogo) ) {
                                         activity?.runOnUiThread {
                                             binding.scoreText.setText(R.string.NoLogo)

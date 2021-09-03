@@ -70,7 +70,7 @@ class ImageFragment: Fragment() {
 
         // Initialization
         val options: ObjectDetector.ObjectDetectorOptions =
-            ObjectDetector.ObjectDetectorOptions.builder().setMaxResults(1).setScoreThreshold(0.1f).build()
+            ObjectDetector.ObjectDetectorOptions.builder().setMaxResults(1).setScoreThreshold(0.7f).build()
 
         val objectDetector: ObjectDetector =
             ObjectDetector.createFromFileAndOptions(context, "model.tflite", options)
