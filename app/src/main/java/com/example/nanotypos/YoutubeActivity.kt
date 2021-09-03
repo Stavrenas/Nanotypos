@@ -7,23 +7,42 @@ import com.google.android.youtube.player.YouTubeInitializationResult
 import com.google.android.youtube.player.YouTubePlayer
 import com.google.android.youtube.player.YouTubePlayerView
 
-class YoutubeActivity :  YouTubeBaseActivity(), YouTubePlayer.OnInitializedListener {
 
-    override fun onInitializationSuccess(provider: YouTubePlayer.Provider?, player: YouTubePlayer?, wasRestored: Boolean) {
-        Toast.makeText(this,"Youtube Api Initialization Success", Toast.LENGTH_SHORT).show()
-        if (!wasRestored) {
-            player?.cueVideo(videoID);
-        }
-    }
-    override fun onInitializationFailure(p0: YouTubePlayer.Provider?, p1: YouTubeInitializationResult?) {
-        Toast.makeText(this,"Youtube Api Initialization Fail", Toast.LENGTH_SHORT).show()
-    }
+/**
+ * A simple YouTube Android API demo application which shows how to create a simple application that
+ * displays a YouTube Video in a [YouTubePlayerView].
+ *
+ *
+ * Note, to use a [YouTubePlayerView], your activity must extend [YouTubeBaseActivity].
+ */
+
+class YoutubeActivity : YouTubeBaseActivity(), YouTubePlayer.OnInitializedListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_youtube)
-        findViewById<YouTubePlayerView>(R.id.ytplayer).initialize(api_key, this)
-
+        setContentView(R.layout.fragment_player)
+        val youTubeView = findViewById<YouTubePlayerView>(R.id.player)
+        youTubeView.initialize(api_key, this)
     }
+
+    override fun onInitializationSuccess(
+        provider: YouTubePlayer.Provider?, player: YouTubePlayer,
+        wasRestored: Boolean
+    ) {
+        if (!wasRestored) {
+            player.cueVideo(videoID)
+        }
+    }
+
+    override fun onInitializationFailure(
+        p0: YouTubePlayer.Provider?,
+        p1: YouTubeInitializationResult?
+    ) {
+        Toast.makeText(this,"Youtube Api Initialization Fail cause $p1", Toast.LENGTH_SHORT).show()
+    }
+
+     val youTubePlayerProvider: YouTubePlayer.Provider
+     get() = findViewById<YouTubePlayerView>(R.id.player)
+
 
     companion object {
         const val videoID = "O2dKo_wC1Dg"
