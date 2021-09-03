@@ -12,16 +12,12 @@ class ViewModel : ViewModel() {
     private val _uri = MutableLiveData<Uri>()
     val uri: LiveData<Uri> = _uri
 
-
-    private val _logoButtonSelected = MutableLiveData<Boolean>()
-    val logoButtonSelected: LiveData<Boolean> = _logoButtonSelected
-
     private val _barcode = MutableLiveData<Barcode>()
     val barcode: LiveData<Barcode> = _barcode
 
-
     private val _text=MutableLiveData<String>()
     val text: LiveData<String> = _text
+
 
     fun setModelUri(targetUri: Uri){
         _uri.value = targetUri
@@ -31,17 +27,6 @@ class ViewModel : ViewModel() {
         return  _uri.value
     }
 
-    fun toggleLogoButton() {
-        _logoButtonSelected.value = !_logoButtonSelected.value!!
-    }
-
-    fun getLogoButton(): Boolean? {
-       return _logoButtonSelected.value
-    }
-
-    fun getBarcode(): Barcode? {
-        return  _barcode.value
-    }
 
     fun setBarcode(bar: Barcode){
         _barcode.value = bar
@@ -58,13 +43,6 @@ class ViewModel : ViewModel() {
     fun getTextValue(): String? {
         return _text.value
     }
-
-
-    init {
-        _logoButtonSelected.value = true
-
-    }
-
 
 }
 

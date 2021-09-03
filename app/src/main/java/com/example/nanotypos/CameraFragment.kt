@@ -54,17 +54,6 @@ class CameraFragment: Fragment(R.layout.fragment_camera)  {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        /*
-        val fragment =
-            activity?.supportFragmentManager?.findFragmentById(R.id.playerFragment)
-        parentFragmentManager.commit {
-            setReorderingAllowed(true)
-            if (fragment != null) {
-                add(R.id.youtubePlayerFragment, fragment)
-            }
-        }
-
-         */
         cameraExecutor = Executors.newSingleThreadExecutor()
     }
 
@@ -74,14 +63,6 @@ class CameraFragment: Fragment(R.layout.fragment_camera)  {
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentCameraBinding.inflate(inflater, container, false)
-        val videoFragment = PlayerFragment()
-        /*
-        childFragmentManager.beginTransaction().apply {
-            add(R.id.youtubePlayerFragment, videoFragment)
-            commit()
-        }
-
-         */
         return binding.root
     }
 
@@ -89,10 +70,8 @@ class CameraFragment: Fragment(R.layout.fragment_camera)  {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (allPermissionsGranted()) {
-            //Toast.makeText(activity, "Make sure the logo is on the center", Toast.LENGTH_LONG).show()
-            Dialog().show(
-                childFragmentManager, "")
-
+            Toast.makeText(activity, "Make sure the logo is on the center", Toast.LENGTH_LONG).show()
+            //Dialog().show(childFragmentManager, "")
             startCamera()
 
         } else {
@@ -105,21 +84,15 @@ class CameraFragment: Fragment(R.layout.fragment_camera)  {
 
     @androidx.camera.core.ExperimentalGetImage
     fun startCamera() {
-        // Create an instance of the ProcessCameraProvider,
-        // which will be used to bind the use cases to a lifecycle owner.
+
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
         val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
-        // Add a listener to the cameraProviderFuture.
-        // The first argument is a Runnable.
-        // The second argument is an Executor that runs on the main thread.
 
 
-        // AIzaSyCZZZ93hntMuPk-RX1DKwrNvgYAAi1lZIE
         cameraProviderFuture.addListener({
-            // Add a ProcessCameraProvider, which binds the lifecycle of the camera to
-            // the LifecycleOwner within the application's life.
-            var start = System.nanoTime()
+
             val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
+
             // Initialize the Preview object, get a surface provider from your PreviewView,
             // and set it on the preview instance.
 
@@ -131,10 +104,8 @@ class CameraFragment: Fragment(R.layout.fragment_camera)  {
             val options: ObjectDetector.ObjectDetectorOptions =
                 ObjectDetector.ObjectDetectorOptions.builder().setMaxResults(1).setNumThreads(3).setScoreThreshold(0.75F).build()
 
-
             val objectDetector: ObjectDetector =
                 ObjectDetector.createFromFileAndOptions(context, "model.tflite", options)
-
 
             // Setup the ImageAnalyzer for the ImageAnalysis use case
             val imageAnalysis =
@@ -144,12 +115,11 @@ class CameraFragment: Fragment(R.layout.fragment_camera)  {
                     .also {
                         it.setAnalyzer(cameraExecutor, { input ->
                             try {
-                                start = System.nanoTime()
+
                                 val bitmap = input.image?.toBitmap()
 
                                 // Run inference
                                 val results: List<Detection> = objectDetector.detect(TensorImage.fromBitmap(bitmap))
-                                //Log.d("LOGO", "draw time: ${(System.nanoTime() - start)/1000000 } ms, detected $totalDetected")
                                 if (results.isNotEmpty()) {
 
                                     val boundingBox = bitmap?.let { it1 -> fixCoords(results.first().boundingBox, it1.width, it1.height) }
@@ -161,22 +131,17 @@ class CameraFragment: Fragment(R.layout.fragment_camera)  {
                                         binding.scoreText.text = "Score is $score"
                                         binding.rectOverlay.post {
                                             if (boundingBox != null) {
-                                                binding.rectOverlay.drawRectangle(boundingBox)
+                                                binding.rectOverlay.draw(boundingBox)
                                             }
                                         }
-                                        if(totalDetected > 30 && !done){
+                                        if (totalDetected > 30 && !done) {
 
-                                            //val intent = Intent(context, YoutubeActivity::class.java)
-                                            //startActivity(intent)
-                                            //findNavController().navigate(R.id.action_cameraFragment_to_playerFragment)
                                             val youtubePlayerFragment = PlayerFragment()
                                             val transaction = parentFragmentManager.beginTransaction()
-                                            transaction.replace(R.id.frameLayout2, youtubePlayerFragment).commit()
+                                            transaction.replace(R.id.videoFragment, youtubePlayerFragment).commit()
                                             done = true
                                             totalDetected = 0
-
                                         }
-
                                     }
 
                                 }
@@ -184,9 +149,8 @@ class CameraFragment: Fragment(R.layout.fragment_camera)  {
                                     totalDetected = 0
                                     if( binding.scoreText.text != getText(R.string.NoLogo) ) {
                                         activity?.runOnUiThread {
-                                            binding.scoreText.setText(R.string.NoLogo)
                                             binding.rectOverlay.post {
-                                                binding.rectOverlay.drawRectangle(
+                                                binding.rectOverlay.draw(
                                                     RectF(
                                                         -1f,
                                                         -1f,
@@ -218,10 +182,10 @@ class CameraFragment: Fragment(R.layout.fragment_camera)  {
         }, ContextCompat.getMainExecutor(requireContext()))
     }
 
-    /**
-     * Helper function used to map the coordinates for objects coming out of
-     * the model into the coordinates that the user sees on the screen.
-     */
+
+    //function used to map the coordinates for objects coming out of
+    //the model into the coordinates that the user sees on the screen.
+
     private fun fixCoords(box: RectF, sourceWidth: Int, sourceHeight: Int): RectF {
         val targetWidth = binding.viewFinder.width.toFloat()
         val targetHeight = binding.viewFinder.height.toFloat()
@@ -298,16 +262,9 @@ class RectOverlay constructor(context: Context?, attributeSet: AttributeSet?) :
     private val rectangles: MutableList<RectF> = mutableListOf()
     private val tagSize = Rect(0, 0, 0, 0)
 
-    /*
-    private val paint = Paint().apply {
-        style = Paint.Style.STROKE
-        color = Color.RED
-        strokeWidth = 4f
-    }
-    */
 
     private val label = "Nanotypos is\nthe best company\nthat has ever existed."
-    private val pen = Paint().apply {
+    val pen = Paint().apply {
         textAlign = Paint.Align.LEFT
         color = resources.getColor(R.color.teal)
         typeface = Typeface.create("HELVETICA", Typeface.BOLD)
@@ -323,9 +280,6 @@ class RectOverlay constructor(context: Context?, attributeSet: AttributeSet?) :
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-
-        //canvas.drawRect(rectangle, paint)
-        //rectangles.forEach { canvas.drawRect(it, paint) }
 
         pen.getTextBounds(label, 0, label.length, tagSize)
         pen.textSize = rectangle.width().times(-0.2F)
@@ -343,7 +297,7 @@ class RectOverlay constructor(context: Context?, attributeSet: AttributeSet?) :
     }
 
 
-    fun drawRectangle(rect: RectF) {
+    fun draw(rect: RectF) {
         this.rectangle = rect
         invalidate()
     }

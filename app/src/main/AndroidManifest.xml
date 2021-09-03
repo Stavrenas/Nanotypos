@@ -26,12 +26,6 @@
         android:supportsRtl="true"
         android:screenOrientation="portrait"
         android:theme="@style/Theme.Nanotypos">
-        <activity
-            android:name=".YoutubeActivity"
-            android:exported="true"
-            android:parentActivityName=".MainActivity">
-
-    </activity>
 
         <provider
             android:name="androidx.core.content.FileProvider"

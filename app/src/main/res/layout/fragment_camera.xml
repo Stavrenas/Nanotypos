@@ -83,11 +83,13 @@
             android:layout_marginTop="10dp"
             android:layout_marginEnd="310dp"
             android:layout_marginBottom="11dp"
+            android:contentDescription="@string/Logo"
             android:src="@drawable/nanotypos"
             app:layout_constraintBottom_toTopOf="@+id/frameLayout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="ImageContrastCheck" />
 
         <TextView
             android:id="@+id/scoreText"
@@ -106,7 +108,7 @@
             tools:text="Score is 0.65656532" />
 
         <FrameLayout
-            android:id="@+id/frameLayout2"
+            android:id="@+id/videoFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="450dp"
@@ -116,20 +118,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/frameLayout"
             tools:visibility="visible">
-            <!--
-            <fragment
-                android:id="@+id/youtubePlayerFragment"
-                android:name="com.example.nanotypos.PlayerFragment"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:visibility="invisible"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:ignore="FragmentTagUsage"
-                tools:visibility="visible" />
--->
+
         </FrameLayout>
 
 

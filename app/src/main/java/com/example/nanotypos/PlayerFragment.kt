@@ -3,18 +3,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.example.nanotypos.databinding.FragmentPlayerBinding
 import com.google.android.youtube.player.YouTubeInitializationResult
 import com.google.android.youtube.player.YouTubePlayer
 import com.google.android.youtube.player.YouTubePlayerFragment
 import com.google.android.youtube.player.YouTubePlayerSupportFragmentX
 
 
-class PlayerFragment: Fragment(R.layout.fragment_player)  , YouTubePlayer.OnInitializedListener{
-
-    private var binding: FragmentPlayerBinding? = null
+class PlayerFragment: Fragment(R.layout.fragment_player) {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -32,6 +28,7 @@ class PlayerFragment: Fragment(R.layout.fragment_player)  , YouTubePlayer.OnInit
                 p2: Boolean
             ) {
                 p1?.loadVideo(videoID)
+                p1?.play()
             }
 
             override fun onInitializationFailure(
@@ -48,33 +45,23 @@ class PlayerFragment: Fragment(R.layout.fragment_player)  , YouTubePlayer.OnInit
 
         (childFragmentManager.findFragmentById(R.id.player) as YouTubePlayerFragment?)?.initialize(
             api_key,
-            this
-        )
+            object : YouTubePlayer.OnInitializedListener {
+                override fun onInitializationSuccess(
+                    p0: YouTubePlayer.Provider?,
+                    p1: YouTubePlayer?,
+                    p2: Boolean
+                ) {
+                    p1?.loadVideo(videoID)
+                    p1?.play()
+                }
+
+                override fun onInitializationFailure(
+                    p0: YouTubePlayer.Provider?,
+                    p1: YouTubeInitializationResult?
+                ) {
+                }
+            })
     }
-
-
-    override fun onInitializationSuccess(
-        provider: YouTubePlayer.Provider?, player: YouTubePlayer,
-        wasRestored: Boolean
-    ) {
-        if (!wasRestored) {
-            Toast.makeText(context,"Youtube Api Initialization success", Toast.LENGTH_SHORT).show()
-            /*
-            player.loadVideo(videoID)
-            player.play()
-
-             */
-        }
-    }
-
-    override fun onInitializationFailure(
-        p0: YouTubePlayer.Provider?,
-        p1: YouTubeInitializationResult?
-    ) {
-        Toast.makeText(context,"Youtube Api Initialization Fail cause $p1", Toast.LENGTH_SHORT).show()
-    }
-
-
 
 
     companion object {
@@ -84,48 +71,3 @@ class PlayerFragment: Fragment(R.layout.fragment_player)  , YouTubePlayer.OnInit
 
 
 }
-
-/*
-/**
- * A simple YouTube Android API demo application which shows how to create a simple application that
- * displays a YouTube Video in a [YouTubePlayerView].
- *
- *
- * Note, to use a [YouTubePlayerView], your activity must extend [YouTubeBaseActivity].
- */
-
-class YoutubeActivity : YouTubeBaseActivity(), YouTubePlayer.OnInitializedListener {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_youtube)
-        val youTubeView = findViewById<YouTubePlayerView>(R.id.player)
-        youTubeView.initialize(api_key, this)
-    }
-
-    override fun onInitializationSuccess(
-        provider: YouTubePlayer.Provider?, player: YouTubePlayer,
-        wasRestored: Boolean
-    ) {
-        if (!wasRestored) {
-            player.cueVideo(videoID)
-        }
-    }
-
-    override fun onInitializationFailure(
-        p0: YouTubePlayer.Provider?,
-        p1: YouTubeInitializationResult?
-    ) {
-        Toast.makeText(this,"Youtube Api Initialization Fail cause $p1", Toast.LENGTH_SHORT).show()
-    }
-
-
-    companion object {
-        const val videoID = "O2dKo_wC1Dg"
-        const val api_key = "AIzaSyCZZZ93hntMuPk-RX1DKwrNvgYAAi1lZIE"
-    }
-}
-
-
- */
-
-
