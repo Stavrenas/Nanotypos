@@ -104,17 +104,7 @@
             app:layout_constraintTop_toBottomOf="@+id/frameLayout"
             app:layout_constraintVertical_bias="1.0"
             tools:text="Score is 0.65656532" />
-            <!--
-              <FrameLayout
-                  android:id="@+id/youtubePlayer"
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  app:layout_constraintBottom_toBottomOf="parent"
-                  app:layout_constraintEnd_toEndOf="parent"
-                  app:layout_constraintStart_toStartOf="parent"
-                  app:layout_constraintTop_toTopOf="@+id/frameLayout" />
-
-
+<!--
         <FrameLayout
             android:id="@+id/frameLayout2"
             android:layout_width="match_parent"
@@ -140,7 +130,7 @@
                 tools:visibility="visible" />
 
         </FrameLayout>
- -->
+-->
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

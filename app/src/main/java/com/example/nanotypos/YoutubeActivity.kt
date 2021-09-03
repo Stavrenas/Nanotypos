@@ -19,7 +19,7 @@ import com.google.android.youtube.player.YouTubePlayerView
 class YoutubeActivity : YouTubeBaseActivity(), YouTubePlayer.OnInitializedListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.fragment_player)
+        setContentView(R.layout.activity_youtube)
         val youTubeView = findViewById<YouTubePlayerView>(R.id.player)
         youTubeView.initialize(api_key, this)
     }
@@ -39,9 +39,6 @@ class YoutubeActivity : YouTubeBaseActivity(), YouTubePlayer.OnInitializedListen
     ) {
         Toast.makeText(this,"Youtube Api Initialization Fail cause $p1", Toast.LENGTH_SHORT).show()
     }
-
-     val youTubePlayerProvider: YouTubePlayer.Provider
-     get() = findViewById<YouTubePlayerView>(R.id.player)
 
 
     companion object {

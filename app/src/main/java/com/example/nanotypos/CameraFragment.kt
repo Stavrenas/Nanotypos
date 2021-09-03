@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.AlertDialog
 import android.app.Dialog
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.*
 import android.media.Image
@@ -24,6 +23,7 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.example.nanotypos.databinding.FragmentCameraBinding
 import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.task.vision.detector.Detection
@@ -50,7 +50,6 @@ class CameraFragment: Fragment(R.layout.fragment_camera)  {
         private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
         private const val REQUEST_CODE_PERMISSIONS = 10
     }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -158,18 +157,21 @@ class CameraFragment: Fragment(R.layout.fragment_camera)  {
 
                                     activity?.runOnUiThread {
                                         totalDetected++
-                                        binding.scoreText.setText("Score is $score")
+                                        binding.scoreText.text = "Score is $score"
                                         binding.rectOverlay.post {
                                             if (boundingBox != null) {
                                                 binding.rectOverlay.drawRectangle(boundingBox)
                                             }
                                         }
-                                        if(totalDetected > 20){
+                                        if(totalDetected > 30){
+
+                                            //val intent = Intent(context, YoutubeActivity::class.java)
+                                            //startActivity(intent)
+
+                                            findNavController().navigate(R.id.action_cameraFragment_to_playerFragment)
                                             //binding.frameLayout2.visibility = View.VISIBLE
-                                            //findNavController().navigate(R.id.action_cameraFragment_to_playerFragment)
-                                                val intent = Intent(context, YoutubeActivity::class.java)
                                             totalDetected = 0
-                                            startActivity(intent)
+
                                         }
 
                                     }
@@ -362,5 +364,6 @@ class Dialog : DialogFragment() {
         const val TAG = "Dialog"
     }
 }
+
 
 
