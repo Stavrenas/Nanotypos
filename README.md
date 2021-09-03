@@ -9,5 +9,5 @@ This android application utilzes simple image recognition to authenticate hologr
  
 ## External Libraries
 * Google Mlkit - Barcode Scanning
-* Tensorflow object detecotor
-* Youtube API
+* Tensorflow object detector
+* YoutubePlayer API
