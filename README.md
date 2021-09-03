@@ -1,2 +1,13 @@
 # Nanotypos
-This android application is going to utilze machine learning or simple image recognition to authenticate holographic prints produced by Nanotypos
+This android application utilzes simple image recognition to authenticate holographic prints produced by Nanotypos.
+
+## Android Libraries and Frameworks used:
+* Android JetPack Navigation
+* CameraX
+* Fragments 
+* Data biding
+ 
+## External Libraries
+* Google Mlkit - Barcode Scanning
+* Tensorflow object detecotor
+* Youtube API
