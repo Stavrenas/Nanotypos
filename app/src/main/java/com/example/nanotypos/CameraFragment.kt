@@ -23,7 +23,6 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
 import com.example.nanotypos.databinding.FragmentCameraBinding
 import org.tensorflow.lite.support.image.TensorImage
 import org.tensorflow.lite.task.vision.detector.Detection
@@ -44,6 +43,8 @@ class CameraFragment: Fragment(R.layout.fragment_camera)  {
     private var _binding: FragmentCameraBinding? = null
     private val binding get() = _binding!!
     private var totalDetected = 0
+    private var done = false
+
 
 
     companion object {
@@ -163,13 +164,15 @@ class CameraFragment: Fragment(R.layout.fragment_camera)  {
                                                 binding.rectOverlay.drawRectangle(boundingBox)
                                             }
                                         }
-                                        if(totalDetected > 30){
+                                        if(totalDetected > 30 && !done){
 
                                             //val intent = Intent(context, YoutubeActivity::class.java)
                                             //startActivity(intent)
-
-                                            findNavController().navigate(R.id.action_cameraFragment_to_playerFragment)
-                                            //binding.frameLayout2.visibility = View.VISIBLE
+                                            //findNavController().navigate(R.id.action_cameraFragment_to_playerFragment)
+                                            val youtubePlayerFragment = PlayerFragment()
+                                            val transaction = parentFragmentManager.beginTransaction()
+                                            transaction.replace(R.id.frameLayout2, youtubePlayerFragment).commit()
+                                            done = true
                                             totalDetected = 0
 
                                         }
@@ -179,7 +182,6 @@ class CameraFragment: Fragment(R.layout.fragment_camera)  {
                                 }
                                 else{
                                     totalDetected = 0
-                                    //binding.frameLayout2.visibility = View.INVISIBLE
                                     if( binding.scoreText.text != getText(R.string.NoLogo) ) {
                                         activity?.runOnUiThread {
                                             binding.scoreText.setText(R.string.NoLogo)
