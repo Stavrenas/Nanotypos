@@ -13,12 +13,12 @@ This android application utilzes simple image recognition to authenticate hologr
 * YoutubePlayer API
 # Home Screen              and              Object detection
 <p align="center">
-  <img src="https://github.com/Stavrenas/Nanotypos/blob/master/Screenshot_2021-10-08-01-40-29-351_com.example.nanotypos.jpg" width="400" height="600" />
-  <img src="https://github.com/Stavrenas/Nanotypos/blob/master/Screenshot_2021-10-08-01-40-43-666_com.example.nanotypos.jpg" width="400" height="600" />
+  <img src="https://github.com/Stavrenas/Nanotypos/blob/master/Screenshot_2021-10-08-01-40-29-351_com.example.nanotypos.jpg" width="400" height="915" />
+  <img src="https://github.com/Stavrenas/Nanotypos/blob/master/Screenshot_2021-10-08-01-40-43-666_com.example.nanotypos.jpg" width="400" height="915" />
 </p>
 
 # Object detection           and            QR code reading
 <p align="center"> 
-  <img src="https://github.com/Stavrenas/Nanotypos/blob/master/Screenshot_2021-10-08-01-41-03-692_com.example.nanotypos.jpg" width="400" height="600" />
-  <img src="https://github.com/Stavrenas/Nanotypos/blob/master/Screenshot_2021-10-08-01-41-07-517_com.example.nanotypos.jpg" width="400" height="600" />
+  <img src="https://github.com/Stavrenas/Nanotypos/blob/master/Screenshot_2021-10-08-01-41-03-692_com.example.nanotypos.jpg" width="400" height="915" />
+  <img src="https://github.com/Stavrenas/Nanotypos/blob/master/Screenshot_2021-10-08-01-41-07-517_com.example.nanotypos.jpg" width="400" height="915" />
 </p>
