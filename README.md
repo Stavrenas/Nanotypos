@@ -1,5 +1,5 @@
 # Nanotypos
-This android application utilzes simple image recognition to authenticate holographic prints produced by Nanotypos.
+This android application utilzes simple object detection to recoginize the company's logo.
 
 ## Android Libraries and Frameworks used:
 * Android JetPack Navigation
